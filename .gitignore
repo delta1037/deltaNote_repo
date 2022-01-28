@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+0-release/
+**cmake-build-release
+**.idea
+*.user
