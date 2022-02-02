@@ -23,10 +23,7 @@ int SqlTodoList::init_table() {
                 "create_key VARCHAR(32) NOT NULL, "\
                 "edit_key VARCHAR(32) PRIMARY Key, "\
                 "op_type VARCHAR(8) NOT NULL, "\
-                "is_check VARCHAR(8) NOT NULL, "\
-                "tag_type VARCHAR(8) NOT NULL, " \
-                "reminder VARCHAR(32) NOT NULL, "\
-                "data VARCHAR(128) NOT NULL"\
+                "group_data VARCHAR(256) NOT NULL"\
             ");";
     SqlRetList sql_ret_list;
     ErrorCode error_code = CODE_NO_ERROR;
@@ -46,22 +43,21 @@ int SqlTodoList::init_table() {
 
 void SqlTodoList::turn_to_struct(const SqlRetList &sql_ret_list, TodoList &ret_struct_list) {
     for(auto ret_it : sql_ret_list){
-        ret_struct_list.emplace_back(
-                (ret_it)[TODO_ITEM_CREATE_KEY],
-                (ret_it)[TODO_ITEM_EDIT_KEY],
-                op_type_enum((ret_it)[TODO_ITEM_OP_TYPE]),
-                is_check_enum((ret_it)[TODO_ITEM_IS_CHECK]),
-                tag_type_enum((ret_it)[TODO_ITEM_TAG_TYPE]),
-                (ret_it)[TODO_ITEM_REMINDER],
-                (ret_it)[TODO_ITEM_DATA]);
-        d_sql_debug("create_key:%s, edit_key:%s, op_type:%s, is_check:%s, tag_type:%s, reminder:%s, data:%s",
+        TodoItem t_item;
+        t_item.create_key = (ret_it)[TODO_ITEM_CREATE_KEY];
+        t_item.edit_key = (ret_it)[TODO_ITEM_EDIT_KEY];
+        t_item.op_type = op_type_enum((ret_it)[TODO_ITEM_OP_TYPE]);
+        group_data_parser((ret_it)[TODO_ITEM_GROUP_DATA],
+                          t_item.is_check,
+                          t_item.tag_type,
+                          t_item.reminder,
+                          t_item.data);
+        ret_struct_list.emplace_back(t_item);
+        d_sql_debug("create_key:%s, edit_key:%s, op_type:%s, group_data:%s",
                     (ret_it)[TODO_ITEM_CREATE_KEY].c_str(),
                     (ret_it)[TODO_ITEM_EDIT_KEY].c_str(),
                     (ret_it)[TODO_ITEM_OP_TYPE].c_str(),
-                    (ret_it)[TODO_ITEM_IS_CHECK].c_str(),
-                    (ret_it)[TODO_ITEM_TAG_TYPE].c_str(),
-                    (ret_it)[TODO_ITEM_REMINDER].c_str(),
-                    (ret_it)[TODO_ITEM_DATA].c_str())
+                    (ret_it)[TODO_ITEM_GROUP_DATA].c_str())
     }
 }
 
@@ -74,12 +70,9 @@ int SqlTodoList::add(
         const std::string &reminder,
         const std::string &data,
         ErrorCode &error_code) {
-    // 生成时间戳
-    // string time_key = std::to_string(get_time_of_ms());
-
     static const std::string add_sql =
-            "INSERT INTO %Q (create_key, edit_key, op_type, is_check, tag_type, reminder, data) "\
-                "VALUES (%Q, %Q, %Q, %Q, %Q, %Q, %Q)";
+            "INSERT INTO %Q (create_key, edit_key, op_type, group_data) "\
+                "VALUES (%Q, %Q, %Q, %Q)";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
             sqlite3_mprintf(
@@ -88,10 +81,7 @@ int SqlTodoList::add(
                     create_key.c_str(),
                     edit_key.c_str(),
                     op_type_str(op_type).c_str(),
-                    is_check_str(is_check).c_str(),
-                    tag_type_str(tag_type).c_str(),
-                    reminder.c_str(),
-                    data.c_str()),
+                    form_group_data(is_check, tag_type, reminder, data).c_str()),
             sql_ret_list,
             error_code
     );
@@ -148,7 +138,7 @@ int SqlTodoList::del(ErrorCode &error_code) {
 // 获取所有数据时带有规则排序
 int SqlTodoList::sel(TodoList &ret_list, ErrorCode &error_code) {
     static const std::string sel_sql =
-            "SELECT create_key, edit_key, op_type, is_check, tag_type, reminder, data from %Q  ORDER BY tag_type, create_key ASC";
+            "SELECT create_key, edit_key, op_type, group_data from %Q";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
             sqlite3_mprintf(
@@ -163,12 +153,15 @@ int SqlTodoList::sel(TodoList &ret_list, ErrorCode &error_code) {
     }
     d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), sel_sql.c_str())
     turn_to_struct(sql_ret_list, ret_list);
+    ret_list.sort([](const TodoItem &item1, const TodoItem &item2) {
+        return tag_type_str(item1.tag_type) < (tag_type_str(item2.tag_type));
+    });
     return RET_SUCCESS;
 }
 
 int SqlTodoList::sel(const std::string &create_key, TodoList &ret_list, ErrorCode &error_code) {
     static const std::string sel_sql =
-            "SELECT create_key, edit_key, op_type, is_check, tag_type, reminder, data from %Q WHERE create_key == %Q";
+            "SELECT create_key, edit_key, op_type, group_data from %Q WHERE create_key == %Q";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
             sqlite3_mprintf(
@@ -189,7 +182,7 @@ int SqlTodoList::sel(const std::string &create_key, TodoList &ret_list, ErrorCod
 
 int SqlTodoList::sel(const std::string &create_key, OpType op_type, TodoList &ret_list, ErrorCode &error_code) {
     static const std::string sel_sql =
-            "SELECT create_key, edit_key, op_type, is_check, tag_type, reminder, data from %Q WHERE create_key == %Q and op_type == %Q;";
+            "SELECT create_key, edit_key, op_type, group_data from %Q WHERE create_key == %Q and op_type == %Q;";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
             sqlite3_mprintf(
@@ -220,7 +213,7 @@ int SqlTodoList::alt(
         const std::string &data,
         ErrorCode &error_code) {
     static const std::string alt_sql =
-            "UPDATE %Q SET edit_key = %Q, op_type == %Q, is_check = %Q, tag_type = %Q, reminder = %Q, data = %Q "\
+            "UPDATE %Q SET edit_key = %Q, op_type == %Q, group_data = %Q "\
                 "WHERE create_key == %Q;";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
@@ -229,10 +222,7 @@ int SqlTodoList::alt(
                     table_name.c_str(),
                     edit_key.c_str(),
                     op_type_str(op_type).c_str(),
-                    is_check_str(is_check).c_str(),
-                    tag_type_str(tag_type).c_str(),
-                    reminder.c_str(),
-                    data.c_str(),
+                    form_group_data(is_check, tag_type, reminder, data).c_str(),
                     create_key.c_str()),
             sql_ret_list,
             error_code
@@ -257,7 +247,7 @@ int SqlTodoList::alt(
         const std::string &data,
         ErrorCode &error_code){
     static const std::string alt_sql =
-            "UPDATE %Q SET edit_key = %Q, is_check = %Q, tag_type = %Q, reminder = %Q, data = %Q "\
+            "UPDATE %Q SET edit_key = %Q, group_data = %Q "\
                 "WHERE create_key == %Q and op_type == %Q;";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
@@ -265,10 +255,7 @@ int SqlTodoList::alt(
                     alt_sql.c_str(),
                     table_name.c_str(),
                     edit_key.c_str(),
-                    is_check_str(is_check).c_str(),
-                    tag_type_str(tag_type).c_str(),
-                    reminder.c_str(),
-                    data.c_str(),
+                    form_group_data(is_check, tag_type, reminder, data).c_str(),
                     create_key.c_str(),
                     op_type_str(op_type).c_str()),
             sql_ret_list,

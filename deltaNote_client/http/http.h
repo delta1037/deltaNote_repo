@@ -14,7 +14,7 @@ typedef int (*SERVER_CALLBACK)(const std::string& req, std::string& res, ErrorCo
 
 class HTTP {
 public:
-    HTTP(HTTPType http_type, const std::string &address, int server_port = 0, bool encode = false);
+    HTTP(HTTPType http_type, const std::string &address, int server_port = 0, bool encode = true);
 
     // 客户端获取大量数据或者少量数据
     int c_get(const std::string &handle, const std::string &req, std::string &res, ErrorCode &error_code);

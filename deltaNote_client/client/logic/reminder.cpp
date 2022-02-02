@@ -48,10 +48,10 @@ bool Reminder::check_and_notify() {
         TodoList ret_list;
         int ret = m_data_ctrl->sel_todo(ListType_UI, it.first, ret_list, error_code);
         if(ret == SQLITE_ERROR){
-            d_logic_error("%s", "Reminder sel_todo error")
+            d_logic_error("%s", "Reminder sel_user error")
             continue;
         }
-        d_logic_debug("%s", "Reminder sel_todo success")
+        d_logic_debug("%s", "Reminder sel_user success")
 
         if(ret_list.size() != 1){
             d_logic_warn("%s", "ret_list size != 1")
@@ -70,10 +70,10 @@ bool Reminder::check_and_notify() {
         item_data.reminder  = ""; // 偷偷改了
         ret = m_data_ctrl->alt_todo(item_data, error_code);
         if(ret == SQLITE_ERROR){
-            d_logic_error("%s", "Reminder alt_todo error")
+            d_logic_error("%s", "Reminder alt_user error")
             continue;
         }
-        d_logic_debug("%s", "Reminder alt_todo success")
+        d_logic_debug("%s", "Reminder alt_user success")
     }
     m_register_map_lock.unlock();
     return ret_val;

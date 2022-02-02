@@ -354,6 +354,7 @@ public:
         fontSizeSlider->setObjectName(QString::fromUtf8("fontSizeSlider"));
         fontSizeSlider->setMinimumSize(QSize(0, 40));
         fontSizeSlider->setCursor(QCursor(Qt::PointingHandCursor));
+        fontSizeSlider->setContextMenuPolicy(Qt::NoContextMenu);
         fontSizeSlider->setStyleSheet(QString::fromUtf8("QSlider::groove:horizontal {\n"
 "background: rgba(0, 0, 0, 0);\n"
 "height: 4px;\n"
@@ -411,7 +412,7 @@ public:
 "border-radius: 4px;\n"
 "}"));
         fontSizeSlider->setMinimum(12);
-        fontSizeSlider->setMaximum(20);
+        fontSizeSlider->setMaximum(24);
         fontSizeSlider->setSingleStep(2);
         fontSizeSlider->setPageStep(2);
         fontSizeSlider->setValue(15);
@@ -491,9 +492,10 @@ public:
 "border: 1px solid #aaa;\n"
 "border-radius: 4px;\n"
 "}"));
-        mainWinWidthSlider->setMinimum(280);
-        mainWinWidthSlider->setMaximum(560);
-        mainWinWidthSlider->setSingleStep(10);
+        mainWinWidthSlider->setMinimum(50);
+        mainWinWidthSlider->setMaximum(400);
+        mainWinWidthSlider->setSingleStep(20);
+        mainWinWidthSlider->setPageStep(20);
         mainWinWidthSlider->setValue(300);
         mainWinWidthSlider->setOrientation(Qt::Horizontal);
 

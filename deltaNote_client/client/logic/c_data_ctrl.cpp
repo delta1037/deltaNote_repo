@@ -1,11 +1,14 @@
 #include "c_data_ctrl.h"
 #include "log.h"
 
+#include <QCoreApplication>
+
 using namespace std;
 
 CDataCtrl::CDataCtrl(){
-    op_list = new SqlTodoList(DB_NAME, DB_TODO_OP_TABLE_NAME);
-    ui_list = new SqlTodoList(DB_NAME, DB_TODO_UI_TABLE_NAME);
+    QString t_db_path = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
+    op_list = new SqlTodoList(t_db_path.toStdString(), DB_TODO_OP_TABLE_NAME);
+    ui_list = new SqlTodoList(t_db_path.toStdString(), DB_TODO_UI_TABLE_NAME);
 }
 
 CDataCtrl::~CDataCtrl(){

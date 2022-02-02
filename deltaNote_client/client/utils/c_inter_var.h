@@ -42,9 +42,9 @@
 #define DB_TODO_UI_TABLE_NAME "todo_ui_table"
 #define DB_TODO_OP_TABLE_NAME "todo_op_table"
 
-
 #define SETTING_USERNAME        "username"
 #define SETTING_PASSWORD        "password"
+#define SETTING_TOKEN           "token"
 #define SETTING_SERVER          "server"
 #define SETTING_IS_LOGIN        "is_login"
 #define SETTING_IS_LOCK         "is_lock"
@@ -58,6 +58,7 @@
 #define SETTING_Y_POS           "y_pos"
 #define SETTING_HEIGHT          "height"
 #define SETTING_WIDTH           "width"
+
 struct NoteSetting{
     std::string username;
     std::string password;

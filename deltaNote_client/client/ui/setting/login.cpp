@@ -219,7 +219,7 @@ void login::doLogin(){
         d_ui_debug("%s", "do sign in progress")
         m_sync_data->sync_sign_in(net_status, error_code);
 
-        if (net_status == Sync_login_success) {
+        if (net_status == Sync_success) {
             accept();
         } else if(net_status == Sync_login_passwd_error) {
             ui->password->clear();
@@ -230,7 +230,7 @@ void login::doLogin(){
             ui->password->clear();
             ui->username->setFocus();
             MessagesBox::warn(this, LOGIN_USER_N_EXITS, m_setting_ctrl);
-        } else if(net_status == Sync_sign_up_undefined_error) {
+        } else if(net_status == Sync_undefined_error) {
             ui->username->clear();
             ui->password->clear();
             ui->username->setFocus();
@@ -371,7 +371,7 @@ void login::on_fontSizeSlider_valueChanged(int value)
 
 void login::on_mainWinWidthSlider_valueChanged(int value)
 {
-    if(value >= 280 && value <= 560){
+    if(value >= 50 && value <= 400){
         m_setting_ctrl->set_int(SETTING_WIDTH, value);
         emit refresh_width();
     }

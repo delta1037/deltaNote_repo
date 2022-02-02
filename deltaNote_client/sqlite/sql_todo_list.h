@@ -13,7 +13,8 @@ public:
     int add(
             const std::string &create_key,
             const std::string &edit_key,
-            OpType op_type, IsCheck is_check,
+            OpType op_type,
+            IsCheck is_check,
             TagType tag_type,
             const std::string &reminder,
             const std::string &data,
@@ -50,9 +51,7 @@ public:
             ErrorCode &error_code);
 private:
     int init_table();
-
     static void turn_to_struct(const SqlRetList &ret_list, TodoList &ret_struct_list);
-
 private:
     SqlBase *sql_base;
     std::string db_name;

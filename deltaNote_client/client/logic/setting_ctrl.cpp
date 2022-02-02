@@ -1,11 +1,14 @@
 #include "log.h"
 #include "setting_ctrl.h"
+
+#include <QCoreApplication>
 SettingCtrl::SettingCtrl(){
-    sql_setting = new SqlKeyValue(DB_NAME, DB_SETTING_TABLE_NAME);
+    QString t_db_path = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
+    m_sql_setting = new SqlKeyValue(t_db_path.toStdString(), DB_SETTING_TABLE_NAME);
 }
 
 SettingCtrl::~SettingCtrl(){
-    delete sql_setting;
+    delete m_sql_setting;
 }
 
 void SettingCtrl::load_all_setting(){
@@ -37,7 +40,7 @@ std::string SettingCtrl::str_bool(bool val) {
 void SettingCtrl::load_sql_data() {
     ErrorCode error_code;
     KeyValueList setting_list;
-    int ret =  sql_setting->sel(setting_list, error_code);
+    int ret =  m_sql_setting->sel(setting_list, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("load data from %s:%s error", DB_NAME, DB_SETTING_TABLE_NAME)
         return;
@@ -100,7 +103,7 @@ std::string SettingCtrl::get_string(const std::string &name, bool deep) {
     }
     ErrorCode error_code;
     std::string ret_str;
-    int ret = sql_setting->sel(name, ret_str, error_code);
+    int ret = m_sql_setting->sel(name, ret_str, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("load setting %s from %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return ret_val;
@@ -121,7 +124,7 @@ void SettingCtrl::set_string(const std::string &name, const std::string &value) 
     update_setting(name, value);
 
     ErrorCode error_code;
-    int ret = sql_setting->add(name, value, error_code);
+    int ret = m_sql_setting->add(name, value, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("set setting %s to %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return;
@@ -150,7 +153,7 @@ int SettingCtrl::get_int(const std::string &name, bool deep) {
     }
     ErrorCode error_code;
     std::string ret_str;
-    int ret = sql_setting->sel(name, ret_str, error_code);
+    int ret = m_sql_setting->sel(name, ret_str, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("load setting %s from %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return ret_val;
@@ -171,7 +174,7 @@ void SettingCtrl::set_int(const std::string &name, int value) {
     update_setting(name, str_int(value));
 
     ErrorCode error_code;
-    int ret = sql_setting->add(name, str_int(value), error_code);
+    int ret = m_sql_setting->add(name, str_int(value), error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("set setting %s to %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return;
@@ -194,7 +197,7 @@ QColor SettingCtrl::get_color(const std::string &name, bool deep) {
     }
     ErrorCode error_code;
     std::string ret_str;
-    int ret = sql_setting->sel(name, ret_str, error_code);
+    int ret = m_sql_setting->sel(name, ret_str, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("load setting %s from %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return color;
@@ -216,7 +219,7 @@ void SettingCtrl::set_color(const std::string &name, const QColor &value) {
     update_setting(name, value.name().toStdString());
 
     ErrorCode error_code;
-    int ret = sql_setting->add(name, value.name().toStdString(), error_code);
+    int ret = m_sql_setting->add(name, value.name().toStdString(), error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("set setting %s to %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return;
@@ -240,7 +243,7 @@ bool SettingCtrl::get_bool(const std::string &name, bool deep) {
 
     ErrorCode error_code;
     std::string ret_str;
-    int ret = sql_setting->sel(name, ret_str, error_code);
+    int ret = m_sql_setting->sel(name, ret_str, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("load setting %s from %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return ret_val;
@@ -261,7 +264,7 @@ void SettingCtrl::set_bool(const std::string &name, bool value) {
     update_setting(name, str_bool(value));
 
     ErrorCode error_code;
-    int ret = sql_setting->add(name, str_bool(value), error_code);
+    int ret = m_sql_setting->add(name, str_bool(value), error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("set setting %s to %s:%s error", name.c_str(), DB_NAME, DB_SETTING_TABLE_NAME)
         return;

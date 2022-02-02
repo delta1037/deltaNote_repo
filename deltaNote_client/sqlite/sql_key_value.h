@@ -22,6 +22,7 @@ public:
     int del(const std::string &, ErrorCode &);
     // 查
     int sel(const std::string &, std::string &, ErrorCode &);
+    int sel(const std::string &key, std::list<std::string> &value_list, ErrorCode &error_code);
     int sel(KeyValueList &, ErrorCode &error_code);
     // 改
     int alt(const std::string &, const std::string &, ErrorCode &);

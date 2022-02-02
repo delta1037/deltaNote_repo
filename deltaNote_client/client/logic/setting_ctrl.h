@@ -41,7 +41,7 @@ private:
 
 private:
     NoteSetting note_setting;
-    SqlKeyValue *sql_setting;
+    SqlKeyValue *m_sql_setting;
 };
 
 

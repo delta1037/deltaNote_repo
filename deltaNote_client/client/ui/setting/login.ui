@@ -773,13 +773,16 @@ border-radius: 4px;
 }</string>
            </property>
            <property name="minimum">
-            <number>280</number>
+            <number>50</number>
            </property>
            <property name="maximum">
-            <number>560</number>
+            <number>400</number>
            </property>
            <property name="singleStep">
-            <number>10</number>
+            <number>20</number>
+           </property>
+           <property name="pageStep">
+            <number>20</number>
            </property>
            <property name="value">
             <number>300</number>

@@ -1,0 +1,6 @@
+{
+    "username": "name",
+    "password": "token/local",
+    "status": 1,
+    "group_data": "data_encrypt"
+}

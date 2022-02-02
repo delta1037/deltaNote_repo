@@ -50,9 +50,9 @@ int HTTP::c_get(const std::string &handle, const std::string &req, std::string &
     // 投递参数 TODO Post之后服务端是怎么处理参数的
     httplib::Headers headers;
     if(s_encode){
-        headers.emplace("head", base64_encode(req, true));
+        headers.emplace("get_req", base64_encode(req, true));
     }else{
-        headers.emplace("head", req);
+        headers.emplace("get_req", req);
     }
     //headers.emplace("path", t_path);
     d_net_debug("client start to get %s, addr:%s", handle.c_str(), m_address.c_str())
@@ -73,6 +73,8 @@ int HTTP::c_get(const std::string &handle, const std::string &req, std::string &
     }
     // 处理遇到的错误
     d_net_error("handle %s get result fail, status is %d", handle.c_str(), http_res->status)
+    d_net_debug("handle %s recv body %s", handle.c_str(), http_res->body.c_str())
+    d_net_debug("handle %s recv reason %s", handle.c_str(), http_res->reason.c_str())
     return RET_FAILED;
 }
 
@@ -88,9 +90,9 @@ int HTTP::c_post(const std::string &handle, const std::string &req, std::string 
     // 投递参数 TODO Post之后服务端是怎么处理参数的
     httplib::Params params;
     if(s_encode){
-        params.emplace("body", base64_encode(req, true));
+        params.emplace("post_req", base64_encode(req, true));
     }else{
-        params.emplace("body", req);
+        params.emplace("post_req", req);
     }
 
     auto http_res = m_client->Post(handle.c_str(), params);
@@ -143,26 +145,31 @@ void HTTP::s_handle_ctrl(const httplib::Request &req, httplib::Response &res) {
     ErrorCode error_code;
     // 分清楚是Post还是Get类型
     std::string s_req;
-    if(!req.headers.empty()){
+    if(req.method == "GET"){
         // GET类型，数据放head了
-        auto it = req.headers.find("head");
+        auto it = req.headers.find("get_req");
         if(it != req.headers.end()){
             s_req = it->second;
+        }else{
+            d_logic_error("%s", "method is get but no param")
         }
-    }
-    if(!req.params.empty() && s_req.empty()){
+    }else if(req.method == "POST"){
         // POST类型放param了
         auto it = req.params.find("body");
         if(it != req.params.end()){
             s_req = it->second;
+        }else{
+            d_logic_error("%s", "method is post but no param")
         }
     }
     if(s_req.empty()){
         d_net_error("path %s get no param", req.path.c_str())
+        return;
     }
     if(s_encode){
         s_req = base64_decode(s_req);
     }
+    d_net_debug("server receive data is %s", s_req.c_str())
 
     std::string s_res;
     int ret = t_handle_func(s_req, s_res, error_code);
@@ -172,8 +179,8 @@ void HTTP::s_handle_ctrl(const httplib::Request &req, httplib::Response &res) {
     if(s_encode){
         s_res = base64_encode(s_res);
     }
-    res.body = s_res;
-    res.status = 200;
+    d_net_debug("s_res: %s", s_res.c_str())
+    res.set_content(s_res, "text/plain");
     d_net_debug("handle %s process success", t_handle.c_str())
 }
 

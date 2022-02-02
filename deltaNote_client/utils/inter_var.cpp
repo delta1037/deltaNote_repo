@@ -1,4 +1,15 @@
+#ifdef WINDOW_BUILD
+#include <Windows.h>
+#include <sphelper.h>
+
+#endif
+#ifdef LINUX_BUILD
+#include <dir.h>
+#endif
 #include "inter_var.h"
+#include "json.h"
+#include "log.h"
+#include "aes_encryption.hpp"
 
 std::string is_check_str(IsCheck is_check){
     if(is_check == Check_true){
@@ -106,7 +117,7 @@ bool check_item_valid(const TodoItem &item){
     return true;
 }
 
-int time_int_s(std::string s_time){
+int time_int_s(const std::string &s_time){
     tm tm_{};
     int year, month, day, hour, minute,second;
     sscanf(s_time.c_str(),"%d-%d-%d %d:%d:%d", &year, &month, &day, &hour, &minute, &second);
@@ -137,4 +148,61 @@ uint64_t get_time_of_s(){
 
 std::string get_time_key(){
     return std::to_string(get_time_of_ms());
+}
+
+std::string form_group_data(IsCheck is_check, TagType tag_type, const std::string &reminder, const std::string &data) {
+    Json::Value t_group_data;
+    t_group_data[TODO_ITEM_IS_CHECK] = is_check_str(is_check);
+    t_group_data[TODO_ITEM_TAG_TYPE] = tag_type_str(tag_type);
+    t_group_data[TODO_ITEM_REMINDER] = reminder;
+    t_group_data[TODO_ITEM_DATA] = data;
+    return t_group_data.toStyledString();
+}
+
+void group_data_parser(const std::string &group_data, IsCheck &is_check, TagType &tag_type, std::string &reminder, std::string &data) {
+    Json::Value t_json_res;
+    Json::Reader t_reader;
+    t_reader.parse(group_data, t_json_res);
+    is_check = is_check_enum(t_json_res.get(TODO_ITEM_IS_CHECK, "").asString());
+    tag_type = tag_type_enum(t_json_res.get(TODO_ITEM_TAG_TYPE, "").asString());
+    reminder = t_json_res.get(TODO_ITEM_REMINDER, "").asString();
+    data = t_json_res.get(TODO_ITEM_DATA, "").asString();
+}
+
+bool todo_is_valid(const TodoItem &item){
+    if(item.is_check == Check_null){
+        return false;
+    }
+    if(item.op_type == OpType_nul){
+        return false;
+    }
+    if(item.data.empty()){
+        return false;
+    }
+    return true;
+}
+
+std::string get_abs_path(){
+    // window 获取存放路径
+    char path_buffer[1024];
+#ifdef WINDOW_BUILD
+    ::GetModuleFileNameA(NULL, path_buffer, 1024);
+    (strrchr(path_buffer, '\\'))[1] = 0;
+#endif
+#ifdef LINUX_BUILD
+    getcwd(path_buffer, 1024);
+#endif
+    return std::string(path_buffer);
+}
+
+std::string encrypt_data(const std::string &src_data, const std::string &key) {
+    AesEncryption aes("cbc", 256);
+    CryptoPP::SecByteBlock enc = aes.encrypt(src_data, key);
+    return std::string(enc.begin(), enc.end());
+}
+
+std::string decrypt_data(const std::string &src_data, const std::string &key) {
+    AesEncryption aes("cbc", 256);
+    CryptoPP::SecByteBlock enc = aes.decrypt(src_data, key);
+    return std::string(enc.begin(), enc.end());
 }

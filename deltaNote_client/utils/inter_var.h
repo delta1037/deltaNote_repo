@@ -5,14 +5,15 @@
 #include <string>
 
 enum SyncStatus {
+    // 未定义错误
+    Sync_undefined_error = 0,
+
+    // 登录错误
     Sync_login_passwd_error = 1,
     Sync_login_user_not_exits = 2,
-    Sync_login_success = 3,
-    Sync_login_undefined_error = 4,
 
+    // 注册错误
     Sync_sign_up_user_exists = 8,
-    Sync_sign_up_success = 9,
-    Sync_sign_up_undefined_error = 10,
 
     Sync_user_id_null,
 
@@ -36,7 +37,7 @@ enum SyncStatus {
     NoUpdateLink,
     AlreadyLatest,
 
-    UndefinedError
+    Sync_success,
 };
 
 enum DeviceType {
@@ -56,6 +57,8 @@ enum ErrorCode {
     CODE_NO_ERROR = 0,
     // 数据库部分
     DB_CREATE_ERROR = 0x00010000, // 数据库创建失败
+
+    Error_user_not_exist,
 };
 
 enum IsCheck {
@@ -82,10 +85,6 @@ enum TagType {
 };
 std::string tag_type_str(TagType tag_type);
 TagType tag_type_enum(const std::string &tag_type);
-
-#define REMINDER_FORMAT "yyyy-MM-dd hh:mm:ss"
-
-int time_int_s(std::string s_time);
 
 struct TodoItem{
     std::string create_key;
@@ -116,15 +115,50 @@ bool check_item_valid(const TodoItem &item);
 #define TODO_ITEM_TAG_TYPE      "tag_type"
 #define TODO_ITEM_REMINDER      "reminder"
 #define TODO_ITEM_DATA          "data"
+#define TODO_ITEM_GROUP_DATA    "group_data"
 
 #define SYNC_SIGN_IN    "/sign_in"
 #define SYNC_SIGN_UP    "/sign_up"
 #define SYNC_UPLOAD     "/upload"
 #define SYNC_DOWNLOAD   "/download"
 
+#define REMINDER_FORMAT "yyyy-MM-dd hh:mm:ss"
+int time_int_s(const std::string &s_time);
 
 std::string get_time_key();
 uint64_t get_time_of_ms();
 uint64_t get_time_of_s();
+
+std::string form_group_data(
+        IsCheck is_check,
+        TagType tag_type,
+        const std::string &reminder,
+        const std::string &data);
+void group_data_parser(
+        const std::string &group_data,
+        IsCheck &is_check,
+        TagType &tag_type,
+        std::string &reminder,
+        std::string &data);
+
+bool todo_is_valid(const TodoItem &item);
+
+// 获取当前可执行文件的绝对路径
+std::string get_abs_path();
+
+// 字符串加密解密
+std::string encrypt_data(const std::string &src_data, const std::string &key);
+std::string decrypt_data(const std::string &src_data, const std::string &key);
+
+struct UserItem{
+    std::string username;
+    std::string password;
+    std::string token;
+};
+#define USER_USERNAME "username"
+#define USER_PASSWORD "password"
+#define USER_TOKEN    "token"
+
+#define UserList std::list<UserItem>
 
 #endif //INTER_VAR_H

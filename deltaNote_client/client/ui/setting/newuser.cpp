@@ -123,30 +123,23 @@ void newUser::on_ok_clicked()
         ui->passwd->setFocus();
         MessagesBox::warn(this, NEW_USER_PASSWD_INCPABLE, m_setting_ctrl);
     } else {
-        // read data and create user
-        // char server_port[SETTING_SERVER_IP_SIZE + SETTING_SERVER_PORT_SIZE]{};
-        // strcpy(server_port, QS_server_port.toUtf8().data());
-
         m_setting_ctrl->set_string(SETTING_USERNAME, QS_username.toStdString());
         m_setting_ctrl->set_string(SETTING_PASSWORD, QS_passwd.toStdString());
-/*
         // do login
-        ConnectCtrl createUserCtrl;
-        createUserCtrl.parserServerPort(server_port);
-        SyncStatus state = createUserCtrl.createNewUser();
-
-        if (state == CreateUserSuccess) {
+        ErrorCode error_code;
+        SyncStatus net_status;
+        m_sync_data->sync_sign_up(net_status, error_code);
+        if (net_status == Sync_success) {
             accept();
-        } else if (state == CreateUserUserExists) {
+        } else if (net_status == Sync_sign_up_user_exists) {
             ui->username->clear();
             ui->username->setFocus();
-            MessagesBox::warn(this, NEW_USER_USER_EXITS);
-        } else if (state == Sync_sign_up_undefined_error) {
-            MessagesBox::warn(this, NEW_USER_SERVER_ERROR);
+            MessagesBox::warn(this, NEW_USER_USER_EXITS, m_setting_ctrl);
+        } else if (net_status == Sync_undefined_error) {
+            MessagesBox::warn(this, NEW_USER_SERVER_ERROR, m_setting_ctrl);
         } else {
-            MessagesBox::warn(this, NEW_USER_SERVER_CON_ERROR);
+            MessagesBox::warn(this, NEW_USER_SERVER_CON_ERROR, m_setting_ctrl);
         }
-        */
     }
 }
 

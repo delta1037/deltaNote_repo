@@ -34,3 +34,6 @@
 **cmake-build-release
 **.idea
 *.user
+bak/
+deltaNote_Android/
+build-deltaNote_client_window-Desktop_Qt_6_2_3_MinGW_64_bit-Release/

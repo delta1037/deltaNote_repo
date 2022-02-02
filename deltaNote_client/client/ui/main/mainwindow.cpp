@@ -343,11 +343,11 @@ void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
     TodoList ret_list;
     int ret = m_data_ctrl.sel_todo(ListType_UI, ret_list, error_code);
     if(ret == SQLITE_ERROR){
-        d_logic_error("%s", "DataCtrlUI sel_todo error")
+        d_logic_error("%s", "DataCtrlUI sel_user error")
         is_sync = false;
         return;
     }
-    d_logic_debug("%s", "DataCtrlUI sel_todo success")
+    d_logic_debug("%s", "DataCtrlUI sel_user success")
 
     // 删除旧的显示
     ui->ToDoListWin->clear();
@@ -455,10 +455,10 @@ void MainWindow::do_clear_done(){
     TodoList ret_list;
     int ret = m_data_ctrl.sel_todo(ListType_UI, ret_list, error_code);
     if(ret == SQLITE_ERROR){
-        d_logic_error("%s", "MainWindow sel_todo error")
+        d_logic_error("%s", "MainWindow sel_user error")
         return;
     }
-    d_logic_debug("%s", "MainWindow sel_todo success")
+    d_logic_debug("%s", "MainWindow sel_user success")
 
     for(auto it : ret_list){
         if(it.is_check == Check_true){
@@ -540,6 +540,7 @@ void MainWindow::refresh_icon_color(){
     } else {
         setStyleSheet("");
     }
+    refresh_font_color();
 }
 
 void MainWindow::refresh_font_color(){

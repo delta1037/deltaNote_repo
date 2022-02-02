@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.17)
-project(note_client_clion)
-project(note_server_clion)
+project(deltaNote_client_terminal)
+project(deltaNote_server_terminal)
 # project(sqlite_test)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_PREFIX_PATH "E:/Qt/6.2.2/mingw_64")
+set(CMAKE_PREFIX_PATH "J:/Qt_install/6.2.3/mingw_64")
 
 # third lib and include
 link_directories(
@@ -15,6 +15,8 @@ link_directories(
         ${CMAKE_SOURCE_DIR}/3rdparty/dlog/bin
         ${CMAKE_SOURCE_DIR}/3rdparty/jsoncpp/bin
         ${CMAKE_SOURCE_DIR}/3rdparty/base64/bin
+        ${CMAKE_SOURCE_DIR}/3rdparty/aes_encryption/bin
+        ${CMAKE_SOURCE_DIR}/3rdparty/cryptopp860/bin
 )
 include_directories(
         ${CMAKE_SOURCE_DIR}/3rdparty/sqlite/include
@@ -22,6 +24,8 @@ include_directories(
         ${CMAKE_SOURCE_DIR}/3rdparty/httplib/include
         ${CMAKE_SOURCE_DIR}/3rdparty/jsoncpp/include
         ${CMAKE_SOURCE_DIR}/3rdparty/base64/include
+        ${CMAKE_SOURCE_DIR}/3rdparty/aes_encryption/include
+        ${CMAKE_SOURCE_DIR}/3rdparty/cryptopp860/include
 )
 
 # project include
@@ -36,6 +40,8 @@ include_directories(
         client/ui/setting
         client/ui/info
         client/ui/utils
+        server/logic
+        server/utils
 )
 
 find_package(Qt6 COMPONENTS
@@ -53,7 +59,7 @@ find_library(dlog_lib NAMES dlog PATHS ${CMAKE_SOURCE_DIR}/3rdparty/dlog/bin)
 find_library(jsoncpp_lib NAMES jsoncpp PATHS ${CMAKE_SOURCE_DIR}/3rdparty/jsoncpp/bin)
 find_library(base64_lib NAMES base64 PATHS ${CMAKE_SOURCE_DIR}/3rdparty/base64/bin)
 
-add_executable(note_client_clion
+add_executable(deltaNote_client_terminal
         client/ui/main/mainwindow.cpp
         client/ui/main/mainwindow.ui
         client/ui/main/todo_detail.cpp
@@ -84,7 +90,8 @@ add_executable(note_client_clion
         client/logic/reminder.cpp
         client/utils/c_inter_var.cpp)
 
-target_link_libraries(note_client_clion
+target_link_libraries(deltaNote_client_terminal
+        ws2_32
         Qt::Core
         Qt::Widgets
         Qt::Gui
@@ -96,29 +103,32 @@ target_link_libraries(note_client_clion
         dlog
         jsoncpp
         base64
+        cryptopp
+        aes_encryption
         )
 
-add_executable(note_server_clion
+add_executable(deltaNote_server_terminal
         utils/inter_var.cpp
         sqlite/sql_base.cpp
-        sqlite/sql_user.cpp
         sqlite/sql_todo_list.cpp
+        sqlite/sql_key_value.cpp
         http/http.cpp
         server/logic/s_sync_data.cpp
         server/logic/s_user_ctrl.cpp
-        server/logic/main.cpp
-        )
-target_link_libraries(note_server_clion
+        server/logic/main.cpp)
+target_link_libraries(deltaNote_server_terminal
         ws2_32
         sqlite3
         dlog
         jsoncpp
         base64
+        cryptopp
+        aes_encryption
         )
 #add_executable(sqlite_test
 #        test/sql_test.cpp
 #        client/sqlite/sql_base.cpp
-#        client/sqlite/sql_setting.cpp
+#        client/sqlite/m_sql_setting.cpp
 #        client/sqlite/sql_todo_list.cpp
 #        client/utils/inter_var.cpp
 #        )
@@ -130,6 +140,7 @@ target_link_libraries(note_server_clion
 
 
 ADD_DEFINITIONS(-DWINDOW_CLIENT)
+ADD_DEFINITIONS(-DWINDOW_BUILD)
 
 
 if (WIN32)
