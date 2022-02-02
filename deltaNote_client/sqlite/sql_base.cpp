@@ -10,7 +10,7 @@ SqlBase::SqlBase(const std::string &db_name){
     this->db_name = db_name;
     this->db_err_msg = nullptr;
 
-    ErrorCode error_code = CODE_NO_ERROR;
+    ErrorCode error_code = Error_no_error;
     if (RET_FAILED == open_db(error_code)){
         // 打开失败，重置变量
         db_handle = nullptr;
@@ -19,7 +19,7 @@ SqlBase::SqlBase(const std::string &db_name){
 }
 
 SqlBase::~SqlBase(){
-    ErrorCode error_code = CODE_NO_ERROR;
+    ErrorCode error_code = Error_no_error;
     close_db(error_code);
 }
 

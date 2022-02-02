@@ -28,7 +28,7 @@ private:
 
     // 数据打包：返回pack
     std::string pack_packet(const std::string &group_data);
-    int unpack_packet(const std::string &pack, std::string &group_data, SyncStatus &net_status);
+    int unpack_packet(const std::string &pack, std::string &group_data, SyncStatus &sync_status, ErrorCode &error_code);
 
 private:
     static Json::Value json_list(const TodoList &todo_list);

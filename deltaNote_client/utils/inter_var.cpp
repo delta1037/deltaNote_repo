@@ -196,12 +196,18 @@ std::string get_abs_path(){
 }
 
 std::string encrypt_data(const std::string &src_data, const std::string &key) {
+    if(src_data == ""){
+        return "";
+    }
     AesEncryption aes("cbc", 256);
     CryptoPP::SecByteBlock enc = aes.encrypt(src_data, key);
     return std::string(enc.begin(), enc.end());
 }
 
 std::string decrypt_data(const std::string &src_data, const std::string &key) {
+    if(src_data == ""){
+        return "";
+    }
     AesEncryption aes("cbc", 256);
     CryptoPP::SecByteBlock enc = aes.decrypt(src_data, key);
     return std::string(enc.begin(), enc.end());

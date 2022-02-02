@@ -24,7 +24,7 @@ int SqlKeyValue::init_table() {
     static const std::string create_table_sql =
             "CREATE TABLE IF NOT EXISTS %Q (key VARCHAR(64) PRIMARY Key, value VARCHAR(128))";
     SqlRetList sql_ret_list;
-    ErrorCode error_code = CODE_NO_ERROR;
+    ErrorCode error_code = Error_no_error;
     int ret = sql_base->exec(
             sqlite3_mprintf(create_table_sql.c_str(), table_name.c_str()),
             sql_ret_list,

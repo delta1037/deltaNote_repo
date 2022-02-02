@@ -19,7 +19,7 @@ public:
     // 获取所有
     int sel_user(UserList &ret_list, ErrorCode &error_code);
     // 按照指定用户名获取
-    int sel_user(const std::string &username, UserItem &data_item, ErrorCode &error_code);
+    int sel_user(const std::string &username, UserItem &user_item, ErrorCode &error_code);
 
 private:
     static std::string group_data(const UserItem &user_item);

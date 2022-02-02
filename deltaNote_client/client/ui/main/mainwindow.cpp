@@ -182,6 +182,7 @@ void MainWindow::on_setting_clicked(){
 
     // 显示setting界面
     //login m_login_window(this, &m_setting_ctrl, m_sync_data);
+    m_login_window->set_value();
     m_login_window->exec();
 
     // 列表内容重绘，这里可能在设置里做了登录操作，所以需要做完整的刷新操作

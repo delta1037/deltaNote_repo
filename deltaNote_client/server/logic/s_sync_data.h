@@ -5,6 +5,7 @@
 #include "inter_var.h"
 #include "s_data_ctrl.h"
 #include "s_user_ctrl.h"
+#include "json.h"
 
 // 定义处理接口
 class SSyncData{
@@ -25,11 +26,12 @@ public:
 
 private:
     // 数据打包：返回pack
-    static std::string pack_packet(const UserItem &data_item, SyncStatus net_status, const std::string &group_data);
+    static std::string pack_packet(const UserItem &data_item, SyncStatus sync_status, const std::string &group_data);
     static int unpack_packet(const std::string &pack, UserItem &data_item, std::string &group_data, ErrorCode &error_code);
 private:
     static SDataCtrl *m_data_ctrl;
     static SUserCtrl *m_user_ctrl;
+    static Json::Reader m_json_reader;
 };
 
 #endif //SERVER_SYNC_DATA_H

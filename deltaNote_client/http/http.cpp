@@ -42,25 +42,26 @@ void HTTP::init_server(){
 int HTTP::c_get(const std::string &handle, const std::string &req, std::string &res, ErrorCode &error_code) {
     if(!check_http_status()){
         d_net_error("%s", "http check fail")
+        error_code = Error_client_error;
         return RET_FAILED;
     }
 
-    // 计算路径
-    //std::string t_path = handle;
-    // 投递参数 TODO Post之后服务端是怎么处理参数的
+    d_net_debug("client get send %s", req.c_str())
+
     httplib::Headers headers;
     if(s_encode){
         headers.emplace("get_req", base64_encode(req, true));
     }else{
         headers.emplace("get_req", req);
     }
-    //headers.emplace("path", t_path);
     d_net_debug("client start to get %s, addr:%s", handle.c_str(), m_address.c_str())
     auto http_res = m_client->Get(handle.c_str(), headers); // , headers
     if(http_res == nullptr){
         d_net_error("client get %s return NULL", handle.c_str())
+        error_code = Error_server_error;
         return RET_FAILED;
     }
+
     d_net_debug("client get return %s, status :%d", handle.c_str(), http_res->status)
     if(http_res->status == 200){
         d_net_debug("handle %s get result success", handle.c_str())
@@ -71,6 +72,7 @@ int HTTP::c_get(const std::string &handle, const std::string &req, std::string &
         }
         return RET_SUCCESS;
     }
+    error_code = Error_server_error;
     // 处理遇到的错误
     d_net_error("handle %s get result fail, status is %d", handle.c_str(), http_res->status)
     d_net_debug("handle %s recv body %s", handle.c_str(), http_res->body.c_str())
@@ -85,9 +87,7 @@ int HTTP::c_post(const std::string &handle, const std::string &req, std::string 
         return RET_FAILED;
     }
 
-    // 计算路径
-    //std::string t_path = "/" + handle;
-    // 投递参数 TODO Post之后服务端是怎么处理参数的
+    d_net_debug("client get send %s", req.c_str())
     httplib::Params params;
     if(s_encode){
         params.emplace("post_req", base64_encode(req, true));
@@ -172,7 +172,10 @@ void HTTP::s_handle_ctrl(const httplib::Request &req, httplib::Response &res) {
     d_net_debug("server receive data is %s", s_req.c_str())
 
     std::string s_res;
+    d_net_debug("handle func %s start call", t_handle.c_str())
     int ret = t_handle_func(s_req, s_res, error_code);
+    d_net_debug("handle func %s end call", t_handle.c_str())
+    d_net_debug("server send data is %s", s_res.c_str())
     if(ret == RET_FAILED){
         d_net_error("handle %s process error", t_handle.c_str())
     }

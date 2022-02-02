@@ -48,6 +48,9 @@
 #define LOGIN_SERVER_ERROR                  "服务器处理错误"
 #define LOGIN_SERVER_CON_ERROR              "服务器无法连接"
 
+#define LOCAL_DATA_PROC_ERROR               "本地数据处理错误"
+#define LOCAL_UNDEFINED_ERROR               "本地未知错误"
+
 #define NEW_USER_SERVER_NULL                LOGIN_SERVER_NULL
 #define NEW_USER_USERNAME_NULL              LOGIN_USERNAME_NULL
 #define NEW_USER_PASSWORD_NULL              LOGIN_PASSWORD_NULL

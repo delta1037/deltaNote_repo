@@ -26,7 +26,7 @@ int SqlTodoList::init_table() {
                 "group_data VARCHAR(256) NOT NULL"\
             ");";
     SqlRetList sql_ret_list;
-    ErrorCode error_code = CODE_NO_ERROR;
+    ErrorCode error_code = Error_no_error;
     int ret = sql_base->exec(
             sqlite3_mprintf(create_table_sql.c_str(), table_name.c_str()),
             sql_ret_list,

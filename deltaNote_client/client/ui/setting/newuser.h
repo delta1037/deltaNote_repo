@@ -32,7 +32,6 @@ private slots:
 
 private:
     Ui::newUser *ui;
-    int ret;
 
     // 配置
     SettingCtrl *m_setting_ctrl;

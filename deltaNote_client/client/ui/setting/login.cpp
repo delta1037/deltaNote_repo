@@ -49,7 +49,8 @@ void login::set_value() {
     if(!t_server.empty()){
         ui->server_port->setText(QString::fromStdString(t_server));
     }
-
+    ui->username->clear();
+    ui->password->clear();
     string t_username = m_setting_ctrl->get_string(SETTING_USERNAME);
     if(m_setting_ctrl->get_bool(SETTING_IS_LOGIN)){
         ui->server_port->setReadOnly(true);
@@ -198,46 +199,55 @@ void login::doLogin(){
 
     if(nullptr == QS_server_port){
         ui->server_port->setFocus();
-        //MessagesBox::warn(this, LOGIN_SERVER_NULL);
+        MessagesBox::warn(this, LOGIN_SERVER_NULL, m_setting_ctrl);
     } else if (nullptr == QS_username) {
         ui->username->setFocus();
-        //MessagesBox::warn(this, LOGIN_USERNAME_NULL);
+        MessagesBox::warn(this, LOGIN_USERNAME_NULL, m_setting_ctrl);
     } else if (nullptr == QS_passwd) {
         ui->password->setFocus();
-        //MessagesBox::warn(this, LOGIN_PASSWORD_NULL);
+        MessagesBox::warn(this, LOGIN_PASSWORD_NULL, m_setting_ctrl);
     } else {
-        // get server_port conn to server
-        //char server_port[SETTING_SERVER_IP_SIZE + SETTING_SERVER_PORT_SIZE]{};
-        //strcpy(server_port, QS_server_port.toLatin1().data());
-
-        // get username and passwd
+        // set username and passwd
         m_setting_ctrl->set_string(SETTING_USERNAME, QS_username.toStdString());
         m_setting_ctrl->set_string(SETTING_PASSWORD, QS_passwd.toStdString());
 
-        SyncStatus net_status;
-        ErrorCode error_code;
+        SyncStatus sync_status = Sync_success;
+        ErrorCode error_code = Error_no_error;
         d_ui_debug("%s", "do sign in progress")
-        m_sync_data->sync_sign_in(net_status, error_code);
+        int ret = m_sync_data->sync_sign_in(sync_status, error_code);
+        if(ret != RET_SUCCESS){
+            d_ui_error("user %s do login error", m_setting_ctrl->get_string(SETTING_USERNAME).c_str());
+        }
+        if(error_code == Error_data_proc_error){
+            MessagesBox::error(this, LOCAL_DATA_PROC_ERROR, m_setting_ctrl);
+            return;
+        }else if(error_code == Error_client_error){
+            MessagesBox::error(this, LOCAL_UNDEFINED_ERROR, m_setting_ctrl);
+            return;
+        }
 
-        if (net_status == Sync_success) {
+        if (sync_status == Sync_success) {
+            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
             accept();
-        } else if(net_status == Sync_login_passwd_error) {
+        } else if(sync_status == Sync_sign_in_passwd_error) {
             ui->password->clear();
             ui->password->setFocus();
             MessagesBox::warn(this, LOGIN_PASSWORD_ERROR, m_setting_ctrl);
-        } else if(net_status == Sync_login_user_not_exits) {
+        } else if(sync_status == Sync_sign_in_user_not_exits) {
             ui->username->clear();
             ui->password->clear();
             ui->username->setFocus();
             MessagesBox::warn(this, LOGIN_USER_N_EXITS, m_setting_ctrl);
-        } else if(net_status == Sync_undefined_error) {
+        } else if(sync_status == Sync_undefined_error) {
             ui->username->clear();
             ui->password->clear();
             ui->username->setFocus();
+            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
             MessagesBox::warn(this, LOGIN_SERVER_ERROR, m_setting_ctrl);
         } else {
             ui->password->clear();
             ui->password->setFocus();
+            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
             MessagesBox::warn(this, LOGIN_SERVER_CON_ERROR, m_setting_ctrl);
         }
     }
@@ -262,6 +272,8 @@ void login::on_creteNewUser_clicked()
     newUser new_user(this, m_setting_ctrl, m_sync_data);
     setWindowOpacity(0);
     if (new_user.exec() == QDialog::Accepted ) {
+        string t_username = m_setting_ctrl->get_string(SETTING_USERNAME);
+        ui->username->setText(QString::fromStdString(t_username));
         accept();
     }
     setWindowOpacity(1);

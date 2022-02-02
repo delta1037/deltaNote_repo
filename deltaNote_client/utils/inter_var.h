@@ -7,13 +7,15 @@
 enum SyncStatus {
     // 未定义错误
     Sync_undefined_error = 0,
+    // 服务端处理出错
+    Sync_server_error,
 
     // 登录错误
-    Sync_login_passwd_error = 1,
-    Sync_login_user_not_exits = 2,
+    Sync_sign_in_passwd_error,      // 密码错误
+    Sync_sign_in_user_not_exits,    // 用户不存在
 
     // 注册错误
-    Sync_sign_up_user_exists = 8,
+    Sync_sign_up_user_exists,       // 用户已存在
 
     Sync_user_id_null,
 
@@ -54,11 +56,16 @@ enum DeviceType {
 
 // 定义错误码
 enum ErrorCode {
-    CODE_NO_ERROR = 0,
+    Error_no_error = 0,
+    Error_server_error,
+    Error_client_error,
     // 数据库部分
     DB_CREATE_ERROR = 0x00010000, // 数据库创建失败
 
     Error_user_not_exist,
+    Error_user_empty,
+
+    Error_data_proc_error,
 };
 
 enum IsCheck {
@@ -122,6 +129,11 @@ bool check_item_valid(const TodoItem &item);
 #define SYNC_UPLOAD     "/upload"
 #define SYNC_DOWNLOAD   "/download"
 
+#define SYNC_USERNAME   "username"
+#define SYNC_PASSWORD   "password"
+#define SYNC_STATUS     "sync_status"
+#define SYNC_GROUP_DATA "group_data"
+
 #define REMINDER_FORMAT "yyyy-MM-dd hh:mm:ss"
 int time_int_s(const std::string &s_time);
 
@@ -129,6 +141,7 @@ std::string get_time_key();
 uint64_t get_time_of_ms();
 uint64_t get_time_of_s();
 
+// 便签内容聚合
 std::string form_group_data(
         IsCheck is_check,
         TagType tag_type,
@@ -141,6 +154,7 @@ void group_data_parser(
         std::string &reminder,
         std::string &data);
 
+// 检查便签内容有效性
 bool todo_is_valid(const TodoItem &item);
 
 // 获取当前可执行文件的绝对路径

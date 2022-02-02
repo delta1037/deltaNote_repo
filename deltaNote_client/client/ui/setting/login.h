@@ -31,6 +31,8 @@ public:
             CSyncData *sync_data = nullptr);
     ~login();
 
+    void set_value();
+
 private slots:
     void on_cancel_clicked();
 
@@ -75,7 +77,6 @@ private:
     QRect    m_desktop_rect;
 
 private:
-    void set_value();
     void refresh_icon();
     void refresh_text();
     void refresh_background();

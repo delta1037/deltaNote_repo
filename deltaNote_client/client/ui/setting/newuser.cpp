@@ -1,5 +1,6 @@
 #include "newuser.h"
 #include "ui_newuser.h"
+#include "log.h"
 
 newUser::newUser(QWidget *parent, SettingCtrl *setting_ctrl, CSyncData *sync_data) :
         QDialog(parent),
@@ -125,17 +126,30 @@ void newUser::on_ok_clicked()
     } else {
         m_setting_ctrl->set_string(SETTING_USERNAME, QS_username.toStdString());
         m_setting_ctrl->set_string(SETTING_PASSWORD, QS_passwd.toStdString());
-        // do login
-        ErrorCode error_code;
-        SyncStatus net_status;
-        m_sync_data->sync_sign_up(net_status, error_code);
-        if (net_status == Sync_success) {
+
+        SyncStatus sync_status = Sync_success;
+        ErrorCode error_code = Error_no_error;
+        d_ui_debug("%s", "do sign in progress")
+        int ret = m_sync_data->sync_sign_up(sync_status, error_code);
+        if(ret != RET_SUCCESS){
+            d_ui_error("user %s do login error", m_setting_ctrl->get_string(SETTING_USERNAME).c_str());
+        }
+        if(error_code == Error_data_proc_error){
+            MessagesBox::error(this, LOCAL_DATA_PROC_ERROR, m_setting_ctrl);
+            return;
+        }else if(error_code == Error_client_error){
+            MessagesBox::error(this, LOCAL_UNDEFINED_ERROR, m_setting_ctrl);
+            return;
+        }
+
+        if (sync_status == Sync_success) {
+            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
             accept();
-        } else if (net_status == Sync_sign_up_user_exists) {
+        } else if (sync_status == Sync_sign_up_user_exists) {
             ui->username->clear();
             ui->username->setFocus();
             MessagesBox::warn(this, NEW_USER_USER_EXITS, m_setting_ctrl);
-        } else if (net_status == Sync_undefined_error) {
+        } else if (sync_status == Sync_undefined_error) {
             MessagesBox::warn(this, NEW_USER_SERVER_ERROR, m_setting_ctrl);
         } else {
             MessagesBox::warn(this, NEW_USER_SERVER_CON_ERROR, m_setting_ctrl);

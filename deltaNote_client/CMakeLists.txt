@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(deltaNote_client_terminal)
 project(deltaNote_server_terminal)
+project(sync_test)
 # project(sqlite_test)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -88,7 +89,8 @@ add_executable(deltaNote_client_terminal
         client/logic/c_sync_data.cpp
         client/logic/main.cpp
         client/logic/reminder.cpp
-        client/utils/c_inter_var.cpp)
+        client/utils/c_inter_var.cpp
+        )
 
 target_link_libraries(deltaNote_client_terminal
         ws2_32
@@ -118,6 +120,35 @@ add_executable(deltaNote_server_terminal
         server/logic/main.cpp)
 target_link_libraries(deltaNote_server_terminal
         ws2_32
+        sqlite3
+        dlog
+        jsoncpp
+        base64
+        cryptopp
+        aes_encryption
+        )
+
+add_executable(sync_test
+        utils/inter_var.cpp
+        sqlite/sql_base.cpp
+        sqlite/sql_todo_list.cpp
+        sqlite/sql_key_value.cpp
+        http/http.cpp
+        client/logic/setting_ctrl.cpp
+        client/logic/c_data_ctrl.cpp
+        client/logic/c_sync_data.cpp
+        client/utils/c_inter_var.cpp
+        test/sync_test.cpp
+        )
+target_link_libraries(sync_test
+        ws2_32
+        Qt::Core
+        Qt::Widgets
+        Qt::Gui
+        Qt::SvgWidgets
+        Qt::Xml
+        Qt::Network
+        Qt::Core5Compat
         sqlite3
         dlog
         jsoncpp

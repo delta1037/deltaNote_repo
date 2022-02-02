@@ -3,7 +3,6 @@
 #include "http.h"
 #include "s_sync_data.h"
 
-
 int register_process(HTTP &server){
     ErrorCode error_code;
     if(RET_FAILED == server.s_register_callback(SYNC_SIGN_IN, SSyncData::sync_sign_in, error_code)){

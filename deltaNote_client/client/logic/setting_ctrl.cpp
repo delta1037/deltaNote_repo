@@ -1,10 +1,10 @@
 #include "log.h"
 #include "setting_ctrl.h"
 
-#include <QCoreApplication>
 SettingCtrl::SettingCtrl(){
-    QString t_db_path = QCoreApplication::applicationDirPath() + "/" + DB_NAME;
-    m_sql_setting = new SqlKeyValue(t_db_path.toStdString(), DB_SETTING_TABLE_NAME);
+    std::string t_db_path = get_abs_path() + "/" + DB_NAME;
+    d_logic_info("open db path %s", t_db_path.c_str())
+    m_sql_setting = new SqlKeyValue(t_db_path, DB_SETTING_TABLE_NAME);
 }
 
 SettingCtrl::~SettingCtrl(){
