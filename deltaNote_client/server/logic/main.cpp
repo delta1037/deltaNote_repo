@@ -11,6 +11,12 @@ int register_process(HTTP &server){
     if(RET_FAILED == server.s_register_callback(SYNC_SIGN_UP, SSyncData::sync_sign_up, error_code)){
         d_logic_error("server %s process register error, code:%d", SYNC_SIGN_UP, error_code);
     }
+    if(RET_FAILED == server.s_register_callback(SYNC_UPLOAD, SSyncData::sync_upload, error_code)){
+        d_logic_error("server %s process register error, code:%d", SYNC_UPLOAD, error_code);
+    }
+    if(RET_FAILED == server.s_register_callback(SYNC_DOWNLOAD, SSyncData::sync_download, error_code)){
+        d_logic_error("server %s process register error, code:%d", SYNC_DOWNLOAD, error_code);
+    }
     return RET_SUCCESS;
 }
 

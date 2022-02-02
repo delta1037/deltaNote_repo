@@ -153,9 +153,6 @@ int SqlTodoList::sel(TodoList &ret_list, ErrorCode &error_code) {
     }
     d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), sel_sql.c_str())
     turn_to_struct(sql_ret_list, ret_list);
-    ret_list.sort([](const TodoItem &item1, const TodoItem &item2) {
-        return tag_type_str(item1.tag_type) < (tag_type_str(item2.tag_type));
-    });
     return RET_SUCCESS;
 }
 

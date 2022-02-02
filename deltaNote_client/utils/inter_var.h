@@ -3,12 +3,15 @@
 #include <ctime>
 #include <sys/time.h>
 #include <string>
+#include "json.h"
+#include <list>
 
 enum SyncStatus {
     // 未定义错误
     Sync_undefined_error = 0,
     // 服务端处理出错
     Sync_server_error,
+    Sync_client_error,
 
     // 登录错误
     Sync_sign_in_passwd_error,      // 密码错误
@@ -133,6 +136,7 @@ bool check_item_valid(const TodoItem &item);
 #define SYNC_PASSWORD   "password"
 #define SYNC_STATUS     "sync_status"
 #define SYNC_GROUP_DATA "group_data"
+#define SYNC_TODO_LIST  "todo_list"
 
 #define REMINDER_FORMAT "yyyy-MM-dd hh:mm:ss"
 int time_int_s(const std::string &s_time);
@@ -174,5 +178,8 @@ struct UserItem{
 #define USER_TOKEN    "token"
 
 #define UserList std::list<UserItem>
+
+Json::Value json_list(const TodoList &todo_list);
+void json_list(TodoList &todo_list, const Json::Value &json_list);
 
 #endif //INTER_VAR_H

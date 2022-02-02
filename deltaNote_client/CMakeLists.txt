@@ -117,6 +117,7 @@ add_executable(deltaNote_server_terminal
         http/http.cpp
         server/logic/s_sync_data.cpp
         server/logic/s_user_ctrl.cpp
+        server/logic/s_data_ctrl.cpp
         server/logic/main.cpp)
 target_link_libraries(deltaNote_server_terminal
         ws2_32

@@ -5,7 +5,7 @@
 
 class SDataCtrl {
 public:
-    SDataCtrl();
+    SDataCtrl(const std::string &username);
     ~SDataCtrl();
 
     // 新增一条
@@ -16,8 +16,13 @@ public:
     int del_todo(const std::string &create_key, ErrorCode &error_code);
     // 获取所有
     int sel_todo(TodoList &ret_list, ErrorCode &error_code);
+    // 合并
+    int mrg_todo(const TodoList &op_list, ErrorCode &error_code);
 
 private:
+    bool check_data_ctrl();
 
+private:
+    SqlTodoList *m_op_list;
 };
 #endif //SERVER_DATA_CTRL_H

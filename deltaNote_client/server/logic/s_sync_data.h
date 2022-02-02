@@ -20,11 +20,13 @@ public:
     static int sync_sign_in(const std::string& req, std::string& res, ErrorCode &error_code);
 
     // 处理上传
-    static int sync_upload(SyncStatus &net_status, ErrorCode &error_code);
+    static int sync_upload(const std::string& req, std::string& res, ErrorCode &error_code);
     // 处理下载
-    static int sync_download(SyncStatus &net_status, ErrorCode &error_code);
+    static int sync_download(const std::string& req, std::string& res, ErrorCode &error_code);
 
 private:
+    // 校验用户
+    static int check_user(const std::string &req, UserItem &user_item, SyncStatus &sync_status, Json::Value &group_json, ErrorCode &error_code);
     // 数据打包：返回pack
     static std::string pack_packet(const UserItem &data_item, SyncStatus sync_status, const std::string &group_data);
     static int unpack_packet(const std::string &pack, UserItem &data_item, std::string &group_data, ErrorCode &error_code);

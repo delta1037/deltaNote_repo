@@ -31,11 +31,10 @@ private:
     int unpack_packet(const std::string &pack, std::string &group_data, SyncStatus &sync_status, ErrorCode &error_code);
 
 private:
-    static Json::Value json_list(const TodoList &todo_list);
-    static void json_list(TodoList &todo_list, const Json::Value &json_list);
-private:
     HTTP *m_net_handle;
     SettingCtrl *m_setting_ctrl;
     CDataCtrl *m_data_ctrl;
+
+    Json::Reader m_json_reader;
 };
 #endif //CLIENT_SYNC_DATA_H
