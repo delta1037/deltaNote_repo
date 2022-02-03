@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.17)
 project(deltaNote_client_terminal)
 project(deltaNote_server_terminal)
-project(sync_test)
-# project(sqlite_test)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_AUTOMOC ON)
@@ -118,6 +116,7 @@ add_executable(deltaNote_server_terminal
         server/logic/s_sync_data.cpp
         server/logic/s_user_ctrl.cpp
         server/logic/s_data_ctrl.cpp
+        server/logic/proc_api.cpp
         server/logic/main.cpp)
 target_link_libraries(deltaNote_server_terminal
         ws2_32
@@ -129,7 +128,26 @@ target_link_libraries(deltaNote_server_terminal
         aes_encryption
         )
 
-add_executable(sync_test
+#[[project(user_ctrl_test)
+add_executable(user_ctrl_test
+        utils/inter_var.cpp
+        sqlite/sql_base.cpp
+        sqlite/sql_todo_list.cpp
+        sqlite/sql_key_value.cpp
+        server/logic/s_user_ctrl.cpp
+        test/user_ctrl_test.cpp
+        )
+target_link_libraries(user_ctrl_test
+        sqlite3
+        dlog
+        jsoncpp
+        base64
+        cryptopp
+        aes_encryption
+)]]
+
+# project(sync_test)
+#[[add_executable(sync_test
         utils/inter_var.cpp
         sqlite/sql_base.cpp
         sqlite/sql_todo_list.cpp
@@ -156,15 +174,17 @@ target_link_libraries(sync_test
         base64
         cryptopp
         aes_encryption
-        )
-#add_executable(sqlite_test
+        )]]
+
+# project(sqlite_test)
+# add_executable(sqlite_test
 #        test/sql_test.cpp
 #        client/sqlite/sql_base.cpp
 #        client/sqlite/m_sql_setting.cpp
 #        client/sqlite/sql_todo_list.cpp
 #        client/utils/inter_var.cpp
 #        )
-#target_link_libraries(sqlite_test
+# target_link_libraries(sqlite_test
 #        Qt::Core
 #        sqlite3
 #        dlog

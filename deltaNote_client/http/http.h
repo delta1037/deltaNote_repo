@@ -10,6 +10,11 @@ enum HTTPType{
     HTTP_server,
 };
 
+enum  ComType{
+    ComType_get,
+    ComType_post,
+};
+
 typedef int (*SERVER_CALLBACK)(const std::string& req, std::string& res, ErrorCode &error_code);
 
 class HTTP {
@@ -23,7 +28,7 @@ public:
 
     // 服务端接口
     int s_start_listen();
-    int s_register_callback(const std::string &handle, SERVER_CALLBACK handle_callback, ErrorCode &error_code);
+    int s_register_callback(ComType com_type, const std::string &handle, SERVER_CALLBACK handle_callback, ErrorCode &error_code);
 
 private:
     void init_client();

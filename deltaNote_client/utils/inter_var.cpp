@@ -233,7 +233,7 @@ Json::Value json_list(const TodoList &todo_list) {
 void json_list(TodoList &todo_list, const Json::Value &json_list) {
     // 将json解析为list的格式
     for(int idx = 0; idx < json_list.size(); idx++){
-        Json::Value one_todo = json_list[0];
+        Json::Value one_todo = json_list[idx];
         TodoItem one_item;
         one_item.create_key = one_todo.get(TODO_ITEM_CREATE_KEY, "").asString();
         one_item.edit_key = one_todo.get(TODO_ITEM_EDIT_KEY, "").asString();

@@ -19,6 +19,7 @@ public:
 
 protected:
     static int exec_callback(void *data, int argc, char **argv, char **ColName);
+    static SqlRetList sql_ret_list;
 
 private:
     // 创建数据库
@@ -29,13 +30,14 @@ private:
     // 从回调中获取数据
     void get_exec_data(SqlRetList &ret_list);
 
+    // 获取数据库对象
+    sqlite3 *get_db_handle();
+
 private:
     // 全局只有一个数据库操作对象
     static sqlite3 *db_handle;
     std::string db_name;
     char *db_err_msg;
-
-    static SqlRetList sql_ret_list;
 };
 
 

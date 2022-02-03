@@ -338,7 +338,13 @@ void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
         }
         last_refresh_time = std::time(nullptr);
 
-        // TODO 与服务器同步，获取并更新数据
+        // 与服务器同步，获取并更新数据
+        SyncStatus net_status;
+        ErrorCode error_code;
+        int ret = m_sync_data->sync_data(net_status, error_code);
+        if(ret != RET_SUCCESS){
+            d_ui_error("net sync data error, net_status:%d, error_code:%d", net_status, error_code)
+        }
     }
     ErrorCode error_code;
     TodoList ret_list;

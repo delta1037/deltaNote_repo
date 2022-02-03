@@ -5,17 +5,10 @@ using namespace std;
 
 sqlite3 *SqlBase::db_handle = nullptr;
 SqlRetList SqlBase::sql_ret_list;
+
 SqlBase::SqlBase(const std::string &db_name){
-    db_handle = nullptr;
     this->db_name = db_name;
     this->db_err_msg = nullptr;
-
-    ErrorCode error_code = Error_no_error;
-    if (RET_FAILED == open_db(error_code)){
-        // 打开失败，重置变量
-        db_handle = nullptr;
-        this->db_err_msg = nullptr;
-    }
 }
 
 SqlBase::~SqlBase(){
@@ -31,10 +24,6 @@ bool SqlBase::check_status(){
 }
 
 int SqlBase::open_db(ErrorCode &error_code){
-    if(db_handle != nullptr){
-        d_sql_info("database %s already init", db_name.c_str())
-        return RET_SUCCESS;
-    }
     int ret = sqlite3_open(db_name.c_str(), &db_handle);
     if(ret == SQLITE_ERROR){
         d_sql_error("open db %s error: %s", db_name.c_str(), db_err_msg)
@@ -58,7 +47,7 @@ int SqlBase::exec_callback(void *param, int col_count, char **col_val, char **co
     d_sql_debug("run %s get data", (const char*)param)
     map<string, string> one_line;
     for(int i = 0; i < col_count; i++){
-        d_sql_debug("key:%s,value:%s", col_name[i], col_val[i])
+        d_sql_debug("col_name:%s,col_val:%s", col_name[i], col_val[i])
         one_line[string(col_name[i])] = string(col_val[i]);
     }
     sql_ret_list.push_back(one_line);
@@ -67,7 +56,7 @@ int SqlBase::exec_callback(void *param, int col_count, char **col_val, char **co
 }
 
 int SqlBase::exec(const std::string &sql, SqlRetList &ret_list, ErrorCode &error_code) {
-    int ret = sqlite3_exec(db_handle, sql.c_str(), (SqlCallback)&(SqlBase::exec_callback), (void *)sql.c_str(), &db_err_msg);
+    int ret = sqlite3_exec(get_db_handle(), sql.c_str(), (SqlCallback)&(SqlBase::exec_callback), (void *)sql.c_str(), &db_err_msg);
     if(ret == SQLITE_ERROR){
         d_sql_error("db %s exec %s error: %s", db_name.c_str(), sql.c_str(), db_err_msg)
         return RET_FAILED;
@@ -80,11 +69,23 @@ int SqlBase::exec(const std::string &sql, SqlRetList &ret_list, ErrorCode &error
 }
 
 void SqlBase::get_exec_data(SqlRetList &ret_list) {
-    d_sql_debug("get data from %s", this->db_name.c_str());
+    d_sql_debug("get data from %s, sql_ret_list size:%d", this->db_name.c_str(), sql_ret_list.size());
     for(const auto& list_it : sql_ret_list){
         ret_list.push_back(list_it);
     }
     sql_ret_list.clear();
+}
+
+sqlite3 *SqlBase::get_db_handle() {
+    if(db_handle == nullptr){
+        ErrorCode error_code = Error_no_error;
+        if (RET_FAILED == open_db(error_code)){
+            // 打开失败，重置变量
+            db_handle = nullptr;
+            this->db_err_msg = nullptr;
+        }
+    }
+    return db_handle;
 }
 
 

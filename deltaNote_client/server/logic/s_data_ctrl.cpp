@@ -68,7 +68,10 @@ int SDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code) {
         if((it.op_type == OpType_add || it.op_type == OpType_alt) && it_find == t_des_map.end()){
             sql_ret = m_op_list->add(it.create_key, it.edit_key, it.op_type, it.is_check, it.tag_type, it.reminder, it.data, error_code);
         }else if(it.op_type == OpType_alt && it_find != t_des_map.end()){
-            sql_ret = m_op_list->alt(it.create_key, it.edit_key, it.op_type, it.is_check, it.tag_type, it.reminder, it.data, error_code);
+            // 如果已经存在，如果时间新一些就替换
+            if(it.edit_key > it_find->second.edit_key){
+                sql_ret = m_op_list->alt(it.create_key, it.edit_key, it.op_type, it.is_check, it.tag_type, it.reminder, it.data, error_code);
+            }
         }else if(it.op_type == OpType_del && it_find != t_des_map.end()){
             sql_ret = m_op_list->del(it.create_key, error_code);
         }else{

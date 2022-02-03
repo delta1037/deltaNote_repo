@@ -29,12 +29,8 @@ int SUserCtrl::del_user(const std::string &username, ErrorCode &error_code) {
     return RET_SUCCESS;
 }
 
-int SUserCtrl::sel_user(std::list<UserItem> &ret_list, ErrorCode &error_code) {
-    return RET_SUCCESS;
-}
-
 int SUserCtrl::sel_user(const std::string &username, UserItem &user_item, ErrorCode &error_code) {
-    d_logic_debug("sql find user %s", username.c_str())
+    d_logic_debug("sql find user %s begin", username.c_str())
     user_item.username = username;
     std::list<std::string> t_value_list;
     int ret = m_sql_user->sel(username, t_value_list ,error_code);
@@ -55,10 +51,7 @@ int SUserCtrl::sel_user(const std::string &username, UserItem &user_item, ErrorC
     }
 
     ret = group_data(*t_value_list.begin(), user_item, error_code);
-    if(ret == RET_FAILED){
-        d_logic_error("user %s unpack group fail, status = %d", username.c_str(), error_code)
-        error_code = Error_server_error;
-    }
+    d_logic_debug("sql find user %s success", username.c_str())
     return ret;
 }
 

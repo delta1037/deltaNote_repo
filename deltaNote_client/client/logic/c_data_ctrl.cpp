@@ -28,7 +28,7 @@ int CDataCtrl::add_todo(const TodoItem &data_item, ErrorCode &error_code) {
             data_item.reminder,
             data_item.data,
             error_code);
-    if(ret == SQLITE_ERROR){
+    if(ret == RET_FAILED){
         d_logic_error("CDataCtrl key %s add m_op_list error", data_item.create_key.c_str())
         return RET_FAILED;
     }
@@ -44,7 +44,7 @@ int CDataCtrl::add_todo(const TodoItem &data_item, ErrorCode &error_code) {
             data_item.reminder,
             data_item.data,
             error_code);
-    if(ret == SQLITE_ERROR){
+    if(ret == RET_FAILED){
         d_logic_error("CDataCtrl key %s add m_ui_list error", data_item.create_key.c_str())
         return RET_FAILED;
     }
@@ -62,7 +62,7 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
     string edit_key = get_time_key();
     TodoList ret_list;
     int ret = m_op_list->sel(data_item.create_key, OpType_alt, ret_list, error_code);
-    if(ret == SQLITE_ERROR){
+    if(ret == RET_FAILED){
         d_logic_error("CDataCtrl key %s sel m_op_list error", data_item.create_key.c_str())
         return RET_FAILED;
     }
@@ -78,7 +78,7 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("CDataCtrl key %s add m_op_list error", data_item.create_key.c_str())
             return RET_FAILED;
         }
@@ -94,7 +94,7 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("CDataCtrl key %s alt m_op_list error", data_item.create_key.c_str())
             return RET_FAILED;
         }
@@ -104,7 +104,7 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
     // UI界面表
     ret_list.clear(); // 注意清理环境
     ret = m_ui_list->sel(data_item.create_key, ret_list, error_code);
-    if(ret == SQLITE_ERROR){
+    if(ret == RET_FAILED){
         d_logic_error("CDataCtrl key %s sel m_ui_list error", data_item.create_key.c_str())
         return RET_FAILED;
     }
@@ -120,7 +120,7 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("CDataCtrl key %s add m_ui_list error", data_item.create_key.c_str())
             return RET_FAILED;
         }
@@ -136,7 +136,7 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("CDataCtrl key %s alt m_ui_list error", data_item.create_key.c_str())
             return RET_FAILED;
         }
@@ -155,7 +155,7 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
     string edit_key = get_time_key();
     TodoList ret_list;
     int ret = m_op_list->sel(create_key, OpType_add, ret_list, error_code);
-    if(ret == SQLITE_ERROR){
+    if(ret == RET_FAILED){
         d_logic_error("CDataCtrl key %s sel m_op_list error", create_key.c_str())
         return RET_FAILED;
     }
@@ -171,7 +171,7 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
                 "",
                 "",
                 error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("CDataCtrl key %s add m_op_list error", create_key.c_str())
             return RET_FAILED;
         }
@@ -179,7 +179,7 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
     }else{
         // 如果存在新增操作，删除所有内容
         ret = m_op_list->del(create_key, error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("CDataCtrl key %s alt m_op_list error", create_key.c_str())
             return RET_FAILED;
         }
@@ -188,7 +188,7 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
 
     // UI表操作，删除相关内容即可
     ret = m_ui_list->del(create_key, error_code);
-    if(ret == SQLITE_ERROR){
+    if(ret == RET_FAILED){
         d_logic_error("CDataCtrl key %s alt m_ui_list error", create_key.c_str())
         return RET_FAILED;
     }
@@ -200,14 +200,14 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
 int CDataCtrl::del_todo(ListType list_type, ErrorCode &error_code) {
     if(list_type == ListType_OP){
         int ret = m_op_list->del(error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("%s", "CDataCtrl del m_op_list error")
             return RET_FAILED;
         }
         d_logic_debug("%s", "CDataCtrl sel m_op_list success")
     }else if(list_type == ListType_UI){
         int ret = m_ui_list->del(error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("%s", "CDataCtrl del m_ui_list error")
             return RET_FAILED;
         }
@@ -222,14 +222,14 @@ int CDataCtrl::del_todo(ListType list_type, ErrorCode &error_code) {
 int CDataCtrl::sel_todo(ListType list_type, TodoList &ret_list, ErrorCode &error_code) {
     if(list_type == ListType_OP){
         int ret = m_op_list->sel(ret_list, error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("%s", "CDataCtrl sel m_op_list error")
             return RET_FAILED;
         }
         d_logic_debug("%s", "CDataCtrl sel m_op_list success")
     }else if(list_type == ListType_UI){
         int ret = m_ui_list->sel(ret_list, error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("%s", "CDataCtrl sel m_ui_list error")
             return RET_FAILED;
         }
@@ -253,14 +253,14 @@ int CDataCtrl::sel_todo(ListType list_type, const string &create_key, list<struc
                         ErrorCode &error_code) {
     if(list_type == ListType_OP){
         int ret = m_op_list->sel(create_key, ret_list, error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("%s", "CDataCtrl sel m_op_list error")
             return RET_FAILED;
         }
         d_logic_debug("%s", "CDataCtrl sel m_op_list success")
     }else if(list_type == ListType_UI){
         int ret = m_ui_list->sel(create_key, ret_list, error_code);
-        if(ret == SQLITE_ERROR){
+        if(ret == RET_FAILED){
             d_logic_error("%s", "CDataCtrl sel m_ui_list error")
             return RET_FAILED;
         }
@@ -274,5 +274,66 @@ int CDataCtrl::sel_todo(ListType list_type, const string &create_key, list<struc
 
 int CDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code){
     // TODO 将远程获取到的操作流生成UI表
+    std::map<std::string, TodoItem> t_todo_map;
+    for(const auto &it: src_list){
+        auto it_find = t_todo_map.find(it.create_key);
+        if(it_find == t_todo_map.end()){
+            if(it.op_type == OpType_add){
+                t_todo_map[it.create_key] = it;
+            }else{
+                // 如果没找到而且不是新增类型肯定出错了
+                d_logic_warn("mrg_todo error create_key:%s, edit_key:%s, op_type:%s, is_check:%s, tag_type:%s, reminder:%s, data:%s",
+                             it.create_key.c_str(),
+                             it.edit_key.c_str(),
+                             op_type_str(it.op_type).c_str(),
+                             is_check_str(it.is_check).c_str(),
+                             tag_type_str(it.tag_type).c_str(),
+                             it.reminder.c_str(),
+                             it.data.c_str())
+            }
+        }else{
+            if(it.op_type == OpType_alt && it_find->second.op_type == OpType_add){
+                // 如果是修改操作，替换之前的新增操作
+                t_todo_map[it.create_key] = it;
+            }else{
+                // 如果找到了而且之前不是新增，说明操作流有问题
+                d_logic_warn("mrg_todo error create_key:%s, edit_key:%s, op_type:%s, is_check:%s, tag_type:%s, reminder:%s, data:%s",
+                             it.create_key.c_str(),
+                             it.edit_key.c_str(),
+                             op_type_str(it.op_type).c_str(),
+                             is_check_str(it.is_check).c_str(),
+                             tag_type_str(it.tag_type).c_str(),
+                             it.reminder.c_str(),
+                             it.data.c_str())
+            }
+        }
+    }
+
+    // 清空原ui表
+    int ret = m_ui_list->del(error_code);
+    if(ret == RET_FAILED){
+        d_logic_error("%s", "CDataCtrl del m_ui_list error")
+        return RET_FAILED;
+    }
+    d_logic_debug("%s", "CDataCtrl del m_ui_list success")
+
+    // 将map挨个插入
+    for(const auto &it:t_todo_map){
+        const TodoItem &todo_item = it.second;
+        ret = m_ui_list->add(
+                todo_item.create_key,
+                todo_item.edit_key,
+                todo_item.op_type,
+                todo_item.is_check,
+                todo_item.tag_type,
+                todo_item.reminder,
+                todo_item.data,
+                error_code);
+        if(ret == RET_FAILED){
+            d_logic_error("CDataCtrl key %s add m_op_list error", todo_item.create_key.c_str())
+            return RET_FAILED;
+        }
+        d_logic_debug("CDataCtrl key %s add m_op_list success", todo_item.create_key.c_str())
+    }
     return RET_SUCCESS;
 }

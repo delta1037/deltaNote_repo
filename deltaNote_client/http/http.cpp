@@ -110,13 +110,21 @@ int HTTP::c_post(const std::string &handle, const std::string &req, std::string 
     return RET_FAILED;
 }
 
-int HTTP::s_register_callback(const std::string &handle, SERVER_CALLBACK handle_callback, ErrorCode &error_code) {
+int HTTP::s_register_callback(ComType com_type, const std::string &handle, SERVER_CALLBACK handle_callback, ErrorCode &error_code) {
     if(!check_http_status()){
         d_net_error("%s", "http check fail")
         return RET_FAILED;
     }
     // 注册到统一接口，之后在统一接口里进行多线程分流
-    m_server->Get(handle, s_handle_ctrl);
+    if(com_type == ComType_get){
+        m_server->Get(handle, s_handle_ctrl);
+    }else if(com_type == ComType_post){
+        m_server->Post(handle, s_handle_ctrl);
+    }else{
+        d_net_error("unknown com type %d", com_type)
+        return RET_FAILED;
+    }
+
     m_server_handle_map[handle] = handle_callback;
     d_net_debug("server register handle %s", handle.c_str())
     return RET_SUCCESS;
@@ -155,7 +163,7 @@ void HTTP::s_handle_ctrl(const httplib::Request &req, httplib::Response &res) {
         }
     }else if(req.method == "POST"){
         // POST类型放param了
-        auto it = req.params.find("body");
+        auto it = req.params.find("post_req");
         if(it != req.params.end()){
             s_req = it->second;
         }else{

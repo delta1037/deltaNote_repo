@@ -16,21 +16,21 @@ int CSyncData::sync_token(SyncStatus &sync_status, ErrorCode &error_code) {
 }
 
 int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
-    d_logic_debug("%s", "sync_sign_up start")
+    d_logic_debug("%s", "api_sign_up start")
     Json::Value req_group_data;
     req_group_data[USER_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
-    d_logic_debug("sync_sign_up send group data:%s", req_group_data.toStyledString().c_str())
+    d_logic_debug("api_sign_up send group data:%s", req_group_data.toStyledString().c_str())
 
     // 聚合数据需要加密
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     int ret = m_net_handle->c_get(SYNC_SIGN_UP, t_req, t_res, error_code);
     if(ret == RET_FAILED){
-        d_logic_error("sync_sign_up send %s to get data error", t_req.c_str())
+        d_logic_error("api_sign_up send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
     }
-    d_logic_debug("sync_sign_up recv data:%s", t_res.c_str())
+    d_logic_debug("api_sign_up recv data:%s", t_res.c_str())
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
@@ -38,28 +38,28 @@ int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
-    d_logic_debug("sync_sign_up data unpack:%s", res_group_data.c_str())
+    d_logic_debug("api_sign_up data unpack:%s", res_group_data.c_str())
 
     // TODO group data 中可以解析出来token
     return RET_SUCCESS;
 }
 
 int CSyncData::sync_sign_in(SyncStatus &sync_status, ErrorCode &error_code) {
-    d_logic_debug("%s", "sync_sign_in start")
+    d_logic_debug("%s", "api_sign_in start")
     Json::Value req_group_data;
     req_group_data[USER_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
-    d_logic_debug("sync_sign_up send group data:%s", req_group_data.toStyledString().c_str())
+    d_logic_debug("api_sign_up send group data:%s", req_group_data.toStyledString().c_str())
 
     // 聚合数据需要加密
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     int ret = m_net_handle->c_get(SYNC_SIGN_IN, t_req, t_res, error_code);
     if(ret == RET_FAILED){
-        d_logic_error("sync_sign_up send %s to get data error", t_req.c_str())
+        d_logic_error("api_sign_up send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
     }
-    d_logic_debug("sync_sign_up recv data:%s", t_res.c_str())
+    d_logic_debug("api_sign_up recv data:%s", t_res.c_str())
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
@@ -67,7 +67,7 @@ int CSyncData::sync_sign_in(SyncStatus &sync_status, ErrorCode &error_code) {
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
-    d_logic_debug("sync_sign_up data unpack:%s", res_group_data.c_str())
+    d_logic_debug("api_sign_up data unpack:%s", res_group_data.c_str())
     return RET_SUCCESS;
 }
 
@@ -84,29 +84,29 @@ int CSyncData::sync_data(SyncStatus &sync_status, ErrorCode &error_code) {
 }
 
 int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
-    d_logic_debug("%s", "sync_upload start")
+    d_logic_debug("%s", "api_upload start")
     Json::Value req_group_data;
     req_group_data[SYNC_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
     TodoList t_todo_list;
     int ret = m_data_ctrl->sel_todo(ListType_OP, t_todo_list, error_code);
     if(ret == RET_FAILED){
-        d_logic_error("sync_upload db sel data error, coee:%d", error_code)
+        d_logic_error("api_upload db sel data error, coee:%d", error_code)
         sync_status = Sync_client_error;
         return RET_FAILED;
     }
     req_group_data[SYNC_TODO_LIST] = json_list(t_todo_list);
-    d_logic_debug("sync_upload send group data:%s", req_group_data.toStyledString().c_str())
+    d_logic_debug("api_upload send group data:%s", req_group_data.toStyledString().c_str())
 
     // 聚合数据需要加密
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     ret = m_net_handle->c_post(SYNC_UPLOAD, t_req, t_res, error_code);
     if(ret == RET_FAILED){
-        d_logic_error("sync_upload send %s to get data error", t_req.c_str())
+        d_logic_error("api_upload send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
     }
-    d_logic_debug("sync_upload recv data:%s", t_res.c_str())
+    d_logic_debug("api_upload recv data:%s", t_res.c_str())
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
@@ -114,26 +114,26 @@ int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
-    d_logic_debug("sync_upload data unpack:%s", res_group_data.c_str())
+    d_logic_debug("api_upload data unpack:%s", res_group_data.c_str())
     return RET_SUCCESS;
 }
 
 int CSyncData::sync_download(SyncStatus &sync_status, ErrorCode &error_code) {
-    d_logic_debug("%s", "sync_download start")
+    d_logic_debug("%s", "api_download start")
     Json::Value req_group_data;
     req_group_data[SYNC_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
-    d_logic_debug("sync_download send group data:%s", req_group_data.toStyledString().c_str())
+    d_logic_debug("api_download send group data:%s", req_group_data.toStyledString().c_str())
 
     // 聚合数据需要加密
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
-    int ret = m_net_handle->c_post(SYNC_UPLOAD, t_req, t_res, error_code);
+    int ret = m_net_handle->c_get(SYNC_DOWNLOAD, t_req, t_res, error_code);
     if(ret == RET_FAILED){
-        d_logic_error("sync_download send %s to get data error", t_req.c_str())
+        d_logic_error("api_download send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
     }
-    d_logic_debug("sync_download recv data:%s", t_res.c_str())
+    d_logic_debug("api_download recv data:%s", t_res.c_str())
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
@@ -141,7 +141,7 @@ int CSyncData::sync_download(SyncStatus &sync_status, ErrorCode &error_code) {
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
-    d_logic_debug("sync_download data unpack:%s", res_group_data.c_str())
+    d_logic_debug("api_download data unpack:%s", res_group_data.c_str())
 
     // 获取list数据，合并到本地
     Json::Value group_json;
