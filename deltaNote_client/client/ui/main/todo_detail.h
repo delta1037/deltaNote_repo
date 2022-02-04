@@ -1,5 +1,10 @@
-#ifndef TODO_DETAIL_H
-#define TODO_DETAIL_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_TODO_DETAIL_H
+#define NOTE_CLIENT_TODO_DETAIL_H
 
 #include <QDialog>
 #include <QPaintEvent>
@@ -65,4 +70,4 @@ private:
     int m_mouse_click_y;
 };
 
-#endif // TODO_DETAIL_H
+#endif // NOTE_CLIENT_TODO_DETAIL_H

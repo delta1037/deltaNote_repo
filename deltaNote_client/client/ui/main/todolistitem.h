@@ -1,5 +1,10 @@
-#ifndef TODOLISTITEM_H
-#define TODOLISTITEM_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_TODOLISTITEM_H
+#define NOTE_CLIENT_TODOLISTITEM_H
 
 #include <QWidget>
 #include <QPainter>
@@ -57,4 +62,4 @@ private:
     QAction *action_detail;
 };
 
-#endif // TODOLISTITEM_H
+#endif // NOTE_CLIENT_TODOLISTITEM_H

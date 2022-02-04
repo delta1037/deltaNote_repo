@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #ifdef WINDOW_BUILD
 #include <Windows.h>
 #include <sphelper.h>
@@ -221,6 +226,8 @@ Json::Value json_list(const TodoList &todo_list) {
         one_todo[TODO_ITEM_EDIT_KEY] = it.edit_key;
         one_todo[TODO_ITEM_OP_TYPE] = op_type_str(it.op_type);
         one_todo[TODO_ITEM_IS_CHECK] = is_check_str(it.is_check);
+        one_todo[TODO_ITEM_TAG_TYPE] = tag_type_str(it.tag_type);
+        one_todo[TODO_ITEM_REMINDER] = it.reminder;
         one_todo[TODO_ITEM_DATA] = it.data;
 
         ret_json.append(one_todo);
@@ -232,29 +239,34 @@ Json::Value json_list(const TodoList &todo_list) {
 
 void json_list(TodoList &todo_list, const Json::Value &json_list) {
     // 将json解析为list的格式
-    for(int idx = 0; idx < json_list.size(); idx++){
-        Json::Value one_todo = json_list[idx];
+    for(const auto& one_todo : json_list){
         TodoItem one_item;
         one_item.create_key = one_todo.get(TODO_ITEM_CREATE_KEY, "").asString();
         one_item.edit_key = one_todo.get(TODO_ITEM_EDIT_KEY, "").asString();
         one_item.op_type = op_type_enum(one_todo.get(TODO_ITEM_OP_TYPE, "").asString());
         one_item.is_check = is_check_enum(one_todo.get(TODO_ITEM_IS_CHECK, "").asString());
+        one_item.tag_type = tag_type_enum(one_todo.get(TODO_ITEM_TAG_TYPE, "").asString());
+        one_item.reminder = one_todo.get(TODO_ITEM_REMINDER, "").asString();
         one_item.data = one_todo.get(TODO_ITEM_DATA, "").asString();
 
         if(check_item_valid(one_item)){
             todo_list.emplace_back(one_item);
-            d_logic_debug("todo valid, create_key:%s,edit_key:%s,op_type:%s,check_type:%s,data:%s",
+            d_logic_debug("todo valid, create_key:%s, edit_key:%s, op_type:%s, check_type:%s, tag_type:%s, reminder:%s, data:%s",
                           one_item.create_key.c_str(),
                           one_item.edit_key.c_str(),
                           op_type_str(one_item.op_type).c_str(),
                           is_check_str(one_item.is_check).c_str(),
+                          tag_type_str(one_item.tag_type).c_str(),
+                          one_item.reminder.c_str(),
                           one_item.data.c_str())
         }else{
-            d_logic_error("todo is invalid, create_key:%s,edit_key:%s,op_type:%s,check_type:%s,data:%s",
+            d_logic_warn("todo is invalid, create_key:%s, edit_key:%s, op_type:%s, check_type:%s, tag_type:%s, reminder:%s, data:%s",
                           one_item.create_key.c_str(),
                           one_item.edit_key.c_str(),
                           op_type_str(one_item.op_type).c_str(),
                           is_check_str(one_item.is_check).c_str(),
+                          tag_type_str(one_item.tag_type).c_str(),
+                          one_item.reminder.c_str(),
                           one_item.data.c_str())
         }
     }

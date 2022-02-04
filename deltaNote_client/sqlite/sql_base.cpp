@@ -1,45 +1,39 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief: sqlite 封装接口
+ */
+#include <unistd.h>
 #include "sql_base.h"
 #include "log.h"
 
 using namespace std;
 
-sqlite3 *SqlBase::db_handle = nullptr;
-SqlRetList SqlBase::sql_ret_list;
+// 全局数据库操作对象管理
+static std::map<std::string, sqlite3 *> g_db_handle;
+// 获取数据库对象
+sqlite3 *get_db_handle(const std::string &db_name){
+    auto it_find = g_db_handle.find(db_name);
+    if(it_find != g_db_handle.end()){
+        return it_find->second;
+    }
 
+    sqlite3 *t_db_handle;
+    char *db_err_msg = nullptr;
+    int ret = 0;
+    ret = sqlite3_open(db_name.c_str(), &t_db_handle);
+    if(ret != SQLITE_OK){
+        d_sql_error("open db %s error: %s", db_name.c_str(), db_err_msg)
+        return nullptr;
+    }
+    g_db_handle[db_name] = t_db_handle;
+    return t_db_handle;
+}
+
+SqlRetList SqlBase::sql_ret_list;
 SqlBase::SqlBase(const std::string &db_name){
     this->db_name = db_name;
     this->db_err_msg = nullptr;
-}
-
-SqlBase::~SqlBase(){
-    ErrorCode error_code = Error_no_error;
-    close_db(error_code);
-}
-
-bool SqlBase::check_status(){
-    if(db_handle == nullptr){
-        return false;
-    }
-    return true;
-}
-
-int SqlBase::open_db(ErrorCode &error_code){
-    int ret = sqlite3_open(db_name.c_str(), &db_handle);
-    if(ret == SQLITE_ERROR){
-        d_sql_error("open db %s error: %s", db_name.c_str(), db_err_msg)
-        return RET_FAILED;
-    }else{
-        d_sql_debug("open db %s success", db_name.c_str())
-        return RET_SUCCESS;
-    }
-}
-
-int SqlBase::close_db(ErrorCode &error_code){
-    if(db_handle != nullptr){
-        sqlite3_close(db_handle);
-        d_sql_debug("close db %s success", db_name.c_str())
-    }
-    return RET_SUCCESS;
 }
 
 int SqlBase::exec_callback(void *param, int col_count, char **col_val, char **col_name) {
@@ -56,16 +50,24 @@ int SqlBase::exec_callback(void *param, int col_count, char **col_val, char **co
 }
 
 int SqlBase::exec(const std::string &sql, SqlRetList &ret_list, ErrorCode &error_code) {
-    int ret = sqlite3_exec(get_db_handle(), sql.c_str(), (SqlCallback)&(SqlBase::exec_callback), (void *)sql.c_str(), &db_err_msg);
-    if(ret == SQLITE_ERROR){
-        d_sql_error("db %s exec %s error: %s", db_name.c_str(), sql.c_str(), db_err_msg)
+    error_code = Error_no_error;
+    sqlite3 *t_db_handle = get_db_handle(db_name);
+    if(t_db_handle == nullptr){
+        d_sql_error("db %s not init", db_name.c_str())
+        error_code = Error_database_init_error;
         return RET_FAILED;
-    }else{
-        d_sql_debug("db %s exec %s success", db_name.c_str(), sql.c_str())
-        // 获取数据
-        get_exec_data(ret_list);
-        return RET_SUCCESS;
     }
+    int ret = sqlite3_exec(t_db_handle, sql.c_str(), (SqlCallback)&(SqlBase::exec_callback), (void *)sql.c_str(), &db_err_msg);
+    if(ret != SQLITE_OK){
+        d_sql_error("db %s exec %s error: %s", db_name.c_str(), sql.c_str(), db_err_msg)
+        error_code = Error_database_exec_error;
+        return RET_FAILED;
+    }
+    d_sql_debug("db %s exec %s success", db_name.c_str(), sql.c_str())
+
+    // 获取数据
+    get_exec_data(ret_list);
+    return RET_SUCCESS;
 }
 
 void SqlBase::get_exec_data(SqlRetList &ret_list) {
@@ -75,17 +77,3 @@ void SqlBase::get_exec_data(SqlRetList &ret_list) {
     }
     sql_ret_list.clear();
 }
-
-sqlite3 *SqlBase::get_db_handle() {
-    if(db_handle == nullptr){
-        ErrorCode error_code = Error_no_error;
-        if (RET_FAILED == open_db(error_code)){
-            // 打开失败，重置变量
-            db_handle = nullptr;
-            this->db_err_msg = nullptr;
-        }
-    }
-    return db_handle;
-}
-
-

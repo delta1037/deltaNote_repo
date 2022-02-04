@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "choosecolor.h"
 #include "ui_choosecolor.h"
 

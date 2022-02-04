@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include <QCoreApplication>
 #include <QDebug>
 #include <unistd.h>

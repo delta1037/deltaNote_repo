@@ -1,5 +1,10 @@
-#ifndef INTER_VAR_H
-#define INTER_VAR_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_INTER_VAR_H
+#define NOTE_INTER_VAR_H
 #include <ctime>
 #include <sys/time.h>
 #include <string>
@@ -9,6 +14,7 @@
 enum SyncStatus {
     // 未定义错误
     Sync_undefined_error = 0,
+
     // 服务端处理出错
     Sync_server_error,
     Sync_client_error,
@@ -20,29 +26,8 @@ enum SyncStatus {
     // 注册错误
     Sync_sign_up_user_exists,       // 用户已存在
 
-    Sync_user_id_null,
-
-    ConnectError = 16,
-
-    PushSuccess = 24,
-    PushError = 25,
-
-    CleanSuccess = 26,
-    CleanError = 27,
-
-    OperateNotDefine = 36,
-
-    PullSuccess,
-    PullError,
-
-    VersionError,
-    RecvSizeError,
-
-    GetUpdateLink,
-    NoUpdateLink,
-    AlreadyLatest,
-
-    Sync_success,
+    // 同步成功
+    Sync_success = 200,
 };
 
 enum DeviceType {
@@ -60,15 +45,21 @@ enum DeviceType {
 // 定义错误码
 enum ErrorCode {
     Error_no_error = 0,
+
+    // 端处理
     Error_server_error,
     Error_client_error,
-    // 数据库部分
-    DB_CREATE_ERROR = 0x00010000, // 数据库创建失败
 
+    // 远程管理
     Error_user_not_exist,
     Error_user_empty,
 
+    // 数据处理
     Error_data_proc_error,
+
+    // 数据库部分
+    Error_database_init_error,
+    Error_database_exec_error,
 };
 
 enum IsCheck {
@@ -182,4 +173,4 @@ struct UserItem{
 Json::Value json_list(const TodoList &todo_list);
 void json_list(TodoList &todo_list, const Json::Value &json_list);
 
-#endif //INTER_VAR_H
+#endif //NOTE_INTER_VAR_H

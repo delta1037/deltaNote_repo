@@ -1,5 +1,10 @@
-#ifndef LOGIN_H
-#define LOGIN_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_LOGIN_H
+#define NOTE_CLIENT_LOGIN_H
 
 #include <QDialog>
 #include <QPaintEvent>
@@ -64,7 +69,6 @@ signals:
 
 private:
     Ui::login *ui;
-    int ret;
 
     double m_mouse_click_x;
     double m_mouse_click_y;
@@ -89,4 +93,4 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 };
 
-#endif // LOGIN_H
+#endif // NOTE_CLIENT_LOGIN_H

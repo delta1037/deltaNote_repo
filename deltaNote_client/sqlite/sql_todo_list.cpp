@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "sql_todo_list.h"
 #include "log.h"
 
@@ -32,13 +37,12 @@ int SqlTodoList::init_table() {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), create_table_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), create_table_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), create_table_sql.c_str())
+    return RET_SUCCESS;
 }
 
 void SqlTodoList::turn_to_struct(const SqlRetList &sql_ret_list, TodoList &ret_struct_list) {
@@ -85,13 +89,12 @@ int SqlTodoList::add(
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), add_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), add_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), add_sql.c_str())
+    return RET_SUCCESS;
 }
 
 int SqlTodoList::del(const std::string &create_key, ErrorCode &error_code) {
@@ -106,13 +109,12 @@ int SqlTodoList::del(const std::string &create_key, ErrorCode &error_code) {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), del_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), del_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), del_sql.c_str())
+    return RET_SUCCESS;
 }
 
 int SqlTodoList::del(ErrorCode &error_code) {
@@ -126,13 +128,12 @@ int SqlTodoList::del(ErrorCode &error_code) {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), del_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), del_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), del_sql.c_str())
+    return RET_SUCCESS;
 }
 
 // 获取所有数据时带有规则排序
@@ -147,7 +148,7 @@ int SqlTodoList::sel(TodoList &ret_list, ErrorCode &error_code) {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), sel_sql.c_str())
         return RET_FAILED;
     }
@@ -168,7 +169,7 @@ int SqlTodoList::sel(const std::string &create_key, TodoList &ret_list, ErrorCod
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), sel_sql.c_str())
         return RET_FAILED;
     }
@@ -190,7 +191,7 @@ int SqlTodoList::sel(const std::string &create_key, OpType op_type, TodoList &re
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), sel_sql.c_str())
         return RET_FAILED;
     }
@@ -210,7 +211,7 @@ int SqlTodoList::alt(
         const std::string &data,
         ErrorCode &error_code) {
     static const std::string alt_sql =
-            "UPDATE %Q SET edit_key = %Q, op_type == %Q, group_data = %Q "\
+            "UPDATE %Q SET edit_key = %Q, op_type = %Q, group_data = %Q "\
                 "WHERE create_key == %Q;";
     SqlRetList sql_ret_list;
     int ret = sql_base->exec(
@@ -224,13 +225,12 @@ int SqlTodoList::alt(
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), alt_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), alt_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), alt_sql.c_str())
+    return RET_SUCCESS;
 }
 
 // 修改数据（根据创建时间+操作类型）
@@ -258,11 +258,10 @@ int SqlTodoList::alt(
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlTodoList %s exec %s error", db_name.c_str(), alt_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), alt_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlTodoList %s exec %s success", db_name.c_str(), alt_sql.c_str())
+    return RET_SUCCESS;
 }

@@ -14,7 +14,7 @@
 # Compiled Dynamic libraries
 *.so
 *.dylib
-*.dll
+# *.dll
 
 # Fortran module files
 *.mod
@@ -37,3 +37,4 @@
 bak/
 deltaNote_Android/
 build-deltaNote_client_window-Desktop_Qt_6_2_3_MinGW_64_bit-Release/
+deltaNote_client/cmake-build-debug

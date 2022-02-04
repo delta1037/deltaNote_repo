@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "newuser.h"
 #include "ui_newuser.h"
 #include "log.h"
@@ -143,7 +148,6 @@ void newUser::on_ok_clicked()
         }
 
         if (sync_status == Sync_success) {
-            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
             accept();
         } else if (sync_status == Sync_sign_up_user_exists) {
             ui->username->clear();

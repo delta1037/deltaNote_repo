@@ -1,5 +1,10 @@
-#ifndef NEWUSER_H
-#define NEWUSER_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_NEWUSER_H
+#define NOTE_CLIENT_NEWUSER_H
 
 #include <QDialog>
 
@@ -50,4 +55,4 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 };
 
-#endif // NEWUSER_H
+#endif // NOTE_CLIENT_NEWUSER_H

@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include <QGuiApplication>
 #include <unistd.h>
 
@@ -25,6 +30,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_location_change = false;
     last_refresh_time = 0;
     is_editing = false;
+    new_todo_add_time_s = 0;
 
     // 连接事件
     event_connect();
@@ -47,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // 初始化完里面一个都没有，整一个空的
     if(0 == ui->ToDoListWin->count()){
         d_ui_debug("%s", "todo list init window is null, add new todo");
+        new_todo_add_time_s = get_time_of_s();
+        d_ui_debug("set new_todo_add_time_s time %d", new_todo_add_time_s)
         add_new_todo_item();
     }
     m_desktop_rect = QGuiApplication::screens()[0]->availableGeometry();
@@ -208,7 +216,10 @@ void MainWindow::on_refresh_clicked(){
     // 刷新界面:先做本地同步刷新，再做网络异步刷新
     d_ui_debug("%s", "on_refresh_clicked do _sync_todo_list")
     sync_todo_list();
-    sync_todo_list(true, true);
+    //if(m_setting_ctrl.get_bool(SETTING_IS_LOGIN)){
+        // 如果登录了就做一下网络刷新
+        sync_todo_list(true, true);
+    //}
 }
 
 // 锁定操作
@@ -271,6 +282,8 @@ void MainWindow::do_add_clicked(){
     // 新增一个条目
     if(0 == ui->ToDoListWin->count()){
         d_logic_debug("%s", "todo list window is null, add new todo");
+        new_todo_add_time_s = get_time_of_s();
+        d_ui_debug("set new_todo_add_time_s time %d", new_todo_add_time_s)
         add_new_todo_item();
         return;
     }
@@ -282,18 +295,33 @@ void MainWindow::do_add_clicked(){
         if(todo->get_item_status() == Item_old){
             TodoItem todo_data = todo->get_item_data();
             del_todo_item(&(todo_data));
+            d_ui_debug("%s", "set new_todo_add_time_s time 0")
         }
+        // 重置计时
+        new_todo_add_time_s = 0;
+
+        // 清理条目
         delete item_data;
         delete todo;
     } else {
+        new_todo_add_time_s = get_time_of_s();
+        d_ui_debug("set new_todo_add_time_s time %d", new_todo_add_time_s)
         add_new_todo_item();
     }
 }
 
 void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
+    // 如果正在编辑，就忽略此次刷新(30s内)
+    uint64_t t_now_times = get_time_of_s();
+    d_ui_debug("now time:%d, last new todo time:%d", t_now_times, new_todo_add_time_s)
+    if(t_now_times - new_todo_add_time_s < 30){
+        d_logic_info("%s", "new todo add, ignore sync")
+        return;
+    }
+
     // 正在编辑不允许刷新
     if(is_editing){
-        d_logic_warn("%s", "item is editing now")
+        d_logic_info("%s", "item is editing now")
         return;
     }
 
@@ -330,6 +358,14 @@ void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
     // 如果需要网络刷新先进行网络刷新
     if(net_sync){
         d_ui_debug("%s", "do net sync !!!")
+
+        // 用户名或者密码为空，不允许做网络刷新
+        if(m_setting_ctrl.get_string(SETTING_USERNAME).empty() || m_setting_ctrl.get_string(SETTING_PASSWORD).empty()){
+            d_ui_debug("username %s or password is null", m_setting_ctrl.get_string(SETTING_USERNAME).c_str())
+            is_sync = false;
+            return;
+        }
+
         // 网络刷新刷新频率
         if(last_refresh_time != 0 && std::time(nullptr) - last_refresh_time <= 3){
             d_ui_debug("%s", "net sync too fast")
@@ -346,6 +382,8 @@ void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
             d_ui_error("net sync data error, net_status:%d, error_code:%d", net_status, error_code)
         }
     }
+
+    // 从数据库获取数据
     ErrorCode error_code;
     TodoList ret_list;
     int ret = m_data_ctrl.sel_todo(ListType_UI, ret_list, error_code);
@@ -371,6 +409,13 @@ void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
             add_new_todo_item(&it);
         }
     }
+
+    // 新增一个条目
+    if(!m_is_show_history && 0 == ui->ToDoListWin->count()){
+        d_logic_debug("%s", "todo list window is null, add new todo");
+        add_new_todo_item();
+    }
+
     is_sync = false;
 }
 
@@ -406,6 +451,7 @@ void MainWindow::ui_alt_todo(const std::string& key, AltType alt_type){
     }
     // 重绘前端
     d_ui_debug("%s", "ui_alt_todo do _sync_todo_list")
+    new_todo_add_time_s = 0; // 重置计时
     set_edit_status(false); // 重置编辑状态
     // 这里重绘是：可能有check操作；修改操作可能修改了优先级；新增操作可能新增了高优先级的
     sync_todo_list(false, false, true);

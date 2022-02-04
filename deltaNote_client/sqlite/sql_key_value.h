@@ -1,5 +1,10 @@
-#ifndef SQL_KEY_VALUE_H
-#define SQL_KEY_VALUE_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_SQL_KEY_VALUE_H
+#define NOTE_SQL_KEY_VALUE_H
 #include <string>
 #include "sql_base.h"
 
@@ -35,4 +40,4 @@ private:
     std::string db_name;
     std::string table_name;
 };
-#endif //SQL_KEY_VALUE_H
+#endif //NOTE_SQL_KEY_VALUE_H

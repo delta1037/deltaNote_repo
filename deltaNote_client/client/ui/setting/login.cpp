@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "login.h"
 #include "ui_login.h"
 #include "log.h"
@@ -118,15 +123,10 @@ void login::refresh_text() {
     ui->password->setFont(font);
 
     QPalette labelPal = ui->transparentLabel->palette();
-    //font = ui->transparentLabel->font();
-    //font.setPixelSize(fontSize);
     labelPal.setColor(QPalette::WindowText, m_setting_ctrl->get_color(SETTING_FONT_COLOR));
     ui->transparentLabel->setPalette(labelPal);
-    //ui->transparentLabel->setFont(font);
     ui->fontSizeLabel->setPalette(labelPal);
-    //ui->fontSizeLabel->setFont(font);
     ui->mainWinWidthLabel->setPalette(labelPal);
-    //ui->mainWinWidthLabel->setFont(font);
     ui->auto_start->setPalette(labelPal);
 }
 
@@ -216,7 +216,7 @@ void login::doLogin(){
         d_ui_debug("%s", "do sign in progress")
         int ret = m_sync_data->sync_sign_in(sync_status, error_code);
         if(ret != RET_SUCCESS){
-            d_ui_error("user %s do login error", m_setting_ctrl->get_string(SETTING_USERNAME).c_str());
+            d_ui_error("user %s do login error", m_setting_ctrl->get_string(SETTING_USERNAME).c_str())
         }
         if(error_code == Error_data_proc_error){
             MessagesBox::error(this, LOCAL_DATA_PROC_ERROR, m_setting_ctrl);
@@ -227,8 +227,7 @@ void login::doLogin(){
         }
 
         if (sync_status == Sync_success) {
-            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
-            accept();
+            set_value();
         } else if(sync_status == Sync_sign_in_passwd_error) {
             ui->password->clear();
             ui->password->setFocus();
@@ -242,24 +241,22 @@ void login::doLogin(){
             ui->username->clear();
             ui->password->clear();
             ui->username->setFocus();
-            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
             MessagesBox::warn(this, LOGIN_SERVER_ERROR, m_setting_ctrl);
         } else {
             ui->password->clear();
             ui->password->setFocus();
-            m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
             MessagesBox::warn(this, LOGIN_SERVER_CON_ERROR, m_setting_ctrl);
         }
     }
 }
 
 void login::doLogout(){
+    m_setting_ctrl->set_string(SETTING_PASSWORD, "");
     m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
-    accept();
+    set_value();
 }
 
-void login::on_Login_clicked()
-{
+void login::on_Login_clicked(){
     if(m_setting_ctrl->get_bool(SETTING_IS_LOGIN)){
         doLogout();
     }else{
@@ -267,8 +264,7 @@ void login::on_Login_clicked()
     }
 }
 
-void login::on_creteNewUser_clicked()
-{
+void login::on_creteNewUser_clicked(){
     newUser new_user(this, m_setting_ctrl, m_sync_data);
     setWindowOpacity(0);
     if (new_user.exec() == QDialog::Accepted ) {
@@ -279,8 +275,7 @@ void login::on_creteNewUser_clicked()
     setWindowOpacity(1);
 }
 
-void login::on_cancel_clicked()
-{
+void login::on_cancel_clicked(){
     reject();
 }
 
@@ -302,8 +297,7 @@ void login::on_chooseFontColor_clicked() {
     refresh_text();
 }
 
-void login::on_choose_bg_color_clicked()
-{
+void login::on_choose_bg_color_clicked(){
     setWindowOpacity(0);
     chooseColor color(this, m_setting_ctrl);
     color.exec();
@@ -336,8 +330,7 @@ void login::on_chooseIconColor_clicked() {
     refresh_icon();
 }
 
-void login::on_radioButton_clicked(bool checked)
-{
+void login::on_radioButton_clicked(bool checked){
     m_setting_ctrl->set_bool(SETTING_IS_AUTO_START, checked);
     QSettings regedit(REGEDIT_AUTO_START_PATH, QSettings::NativeFormat);
     if(checked) {
@@ -348,21 +341,18 @@ void login::on_radioButton_clicked(bool checked)
     }
 }
 
-void login::on_exit_clicked()
-{
+void login::on_exit_clicked(){
     accept();
 }
 
-void login::mouseMoveEvent(QMouseEvent *event)
-{
+void login::mouseMoveEvent(QMouseEvent *event){
     event->ignore();
     if (event->buttons() & Qt::LeftButton){
         move(event->globalPosition().x() - m_mouse_click_x, event->globalPosition().y() - m_mouse_click_y);
     }
 }
 
-void login::mousePressEvent(QMouseEvent *event)
-{
+void login::mousePressEvent(QMouseEvent *event){
     event->ignore();
     if (event->button() == Qt::LeftButton)  //每当按下鼠标左键就记录一下位置
     {
@@ -371,8 +361,7 @@ void login::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void login::on_fontSizeSlider_valueChanged(int value)
-{
+void login::on_fontSizeSlider_valueChanged(int value){
     if(value >= 9 && value <= 16){
         m_setting_ctrl->set_int(SETTING_FONT_SIZE, value);
         emit refresh_font_color();
@@ -380,18 +369,14 @@ void login::on_fontSizeSlider_valueChanged(int value)
     refresh_text();
 }
 
-
-void login::on_mainWinWidthSlider_valueChanged(int value)
-{
+void login::on_mainWinWidthSlider_valueChanged(int value){
     if(value >= 50 && value <= 400){
         m_setting_ctrl->set_int(SETTING_WIDTH, value);
         emit refresh_width();
     }
 }
 
-
-void login::on_transparent_valueChanged(int value)
-{
+void login::on_transparent_valueChanged(int value){
     if(value >=0 && value <=255){
         value -= 1;
         m_setting_ctrl->set_int(SETTING_TRAN_POS, value > 0 ? value : 0);

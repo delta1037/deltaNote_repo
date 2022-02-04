@@ -1,5 +1,10 @@
-#ifndef CLIENT_DATA_CTRL_H
-#define CLIENT_DATA_CTRL_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_DATA_CTRL_H
+#define NOTE_CLIENT_DATA_CTRL_H
 #include <string>
 
 #include "sql_todo_list.h"
@@ -34,4 +39,4 @@ private:
     SqlTodoList *m_op_list;
     SqlTodoList *m_ui_list;
 };
-#endif //CLIENT_DATA_CTRL_H
+#endif //NOTE_CLIENT_DATA_CTRL_H

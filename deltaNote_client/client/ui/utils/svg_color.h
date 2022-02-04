@@ -1,5 +1,10 @@
-#ifndef SVG_COLOR_H
-#define SVG_COLOR_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_SVG_COLOR_H
+#define NOTE_CLIENT_SVG_COLOR_H
 
 #include <QGraphicsSvgItem>
 #include <QDomDocument>
@@ -22,4 +27,4 @@ private:
     void recur_change_attr(QDomNode node, QString attName, QString attValue);
 };
 
-#endif // SVG_COLOR_H
+#endif // NOTE_CLIENT_SVG_COLOR_H

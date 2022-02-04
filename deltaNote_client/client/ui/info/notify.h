@@ -1,5 +1,10 @@
-#ifndef NOTIFY_H
-#define NOTIFY_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_NOTIFY_H
+#define NOTE_CLIENT_NOTIFY_H
 
 #include <QDialog>
 #include <QPaintEvent>
@@ -54,4 +59,4 @@ public:
     static void error(QWidget *parent, QString message, SettingCtrl *setting_ctrl, bool parent_main=false);
 };
 
-#endif // NOTIFY_H
+#endif // NOTE_CLIENT_NOTIFY_H

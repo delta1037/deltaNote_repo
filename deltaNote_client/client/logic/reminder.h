@@ -1,5 +1,10 @@
-#ifndef CLIENT_REMINDER_H
-#define CLIENT_REMINDER_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_REMINDER_H
+#define NOTE_CLIENT_REMINDER_H
 #include <QMutex>
 #include <string>
 #include <map>
@@ -27,4 +32,4 @@ private:
     QMutex m_register_map_lock;
 };
 
-#endif //CLIENT_REMINDER_H
+#endif //NOTE_CLIENT_REMINDER_H

@@ -1,5 +1,10 @@
-#ifndef CHECKUPDATE_H
-#define CHECKUPDATE_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_CHECK_UPDATE_H
+#define NOTE_CLIENT_CHECK_UPDATE_H
 
 #include <QDialog>
 #include <QFile>
@@ -12,7 +17,7 @@
 #include <QBitmap>
 #include <QString>
 
-#include "common/untils.h"
+#include "c_inter_var.h"
 #include "notify.h"
 
 namespace Ui {
@@ -66,4 +71,4 @@ private:
     int m_nMouseClick_Y_Coordinate;
 };
 
-#endif // CHECKUPDATE_H
+#endif // NOTE_CLIENT_CHECK_UPDATE_H

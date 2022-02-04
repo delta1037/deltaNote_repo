@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "log.h"
 #include "sql_key_value.h"
 
@@ -30,13 +35,12 @@ int SqlKeyValue::init_table() {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), create_table_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), create_table_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), create_table_sql.c_str())
+    return RET_SUCCESS;
 }
 
 void SqlKeyValue::turn_to_struct(const SqlRetList &sql_ret_list, KeyValueList &ret_struct_list) {
@@ -59,13 +63,12 @@ int SqlKeyValue::add(const std::string &key, const std::string &value, ErrorCode
             sql_ret_list,
             error_code
             );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK) {
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), add_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), add_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), add_sql.c_str())
+    return RET_SUCCESS;
 }
 
 int SqlKeyValue::del(const std::string &key, ErrorCode &error_code) {
@@ -77,13 +80,12 @@ int SqlKeyValue::del(const std::string &key, ErrorCode &error_code) {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), add_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), add_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), add_sql.c_str())
+    return RET_SUCCESS;
 }
 
 int SqlKeyValue::sel(const std::string &key, std::string &value, ErrorCode &error_code) {
@@ -95,15 +97,17 @@ int SqlKeyValue::sel(const std::string &key, std::string &value, ErrorCode &erro
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), sel_sql.c_str())
         return RET_FAILED;
     }
     d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), sel_sql.c_str())
+
     // 获取数值
     if(sql_ret_list.size() != 1){
         d_sql_warn("ret list size = %d, key=%s", sql_ret_list.size(), key.c_str())
     }
+
     // 只取第一行的值
     if(!sql_ret_list.empty()){
         value = (*sql_ret_list.begin())["value"];
@@ -120,11 +124,12 @@ int SqlKeyValue::sel(const std::string &key, std::list<std::string> &value_list,
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), sel_sql.c_str())
         return RET_FAILED;
     }
     d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), sel_sql.c_str())
+
     // 获取数值
     if(sql_ret_list.size() != 1){
         d_sql_warn("ret list size = %d, key=%s", sql_ret_list.size(), key.c_str())
@@ -144,7 +149,7 @@ int SqlKeyValue::sel(KeyValueList &key_value_list, ErrorCode &error_code) {
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), sel_sql.c_str())
         return RET_FAILED;
     }
@@ -162,11 +167,10 @@ int SqlKeyValue::alt(const std::string &key, const std::string &value, ErrorCode
             sql_ret_list,
             error_code
     );
-    if(ret == SQLITE_ERROR){
+    if(ret != SQLITE_OK){
         d_sql_error("SqlKeyValue %s exec %s error", db_name.c_str(), alt_sql.c_str())
         return RET_FAILED;
-    }else{
-        d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), alt_sql.c_str())
-        return RET_SUCCESS;
     }
+    d_sql_debug("SqlKeyValue %s exec %s success", db_name.c_str(), alt_sql.c_str())
+    return RET_SUCCESS;
 }

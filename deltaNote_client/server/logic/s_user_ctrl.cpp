@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "s_user_ctrl.h"
 #include "json.h"
 #include "log.h"
@@ -21,16 +26,9 @@ int SUserCtrl::add_user(const UserItem &data_item, ErrorCode &error_code) {
     return RET_SUCCESS;
 }
 
-int SUserCtrl::alt_user(const UserItem &data_item, ErrorCode &error_code) {
-    return RET_SUCCESS;
-}
-
-int SUserCtrl::del_user(const std::string &username, ErrorCode &error_code) {
-    return RET_SUCCESS;
-}
-
 int SUserCtrl::sel_user(const std::string &username, UserItem &user_item, ErrorCode &error_code) {
-    d_logic_debug("sql find user %s begin", username.c_str())
+    d_logic_debug("sql find user |%s| begin", username.c_str())
+
     user_item.username = username;
     std::list<std::string> t_value_list;
     int ret = m_sql_user->sel(username, t_value_list ,error_code);
@@ -68,11 +66,5 @@ int SUserCtrl::group_data(const std::string &data, UserItem &user_item, ErrorCod
     t_reader.parse(data, t_json_res);
     user_item.password = t_json_res.get(USER_PASSWORD, "").asString();
     user_item.token = t_json_res.get(USER_TOKEN, "").asString();
-
-    return check_user(user_item, error_code);
-}
-
-int SUserCtrl::check_user(const UserItem &user_item, ErrorCode &error_code){
-    // 校验token，是否过期
     return RET_SUCCESS;
 }

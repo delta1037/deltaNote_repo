@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "todolistitem.h"
 #include "ui_todolistitem.h"
 #include "log.h"
@@ -182,4 +187,3 @@ void ToDoListItem::on_data_customContextMenuRequested(const QPoint &pos){
     emit todo_edit_status(false);
     custom_context_show = false;
 }
-

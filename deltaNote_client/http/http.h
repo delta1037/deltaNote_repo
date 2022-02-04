@@ -1,6 +1,10 @@
-#ifndef NOTE_CLIENT_CLION_HTTP_H
-#define NOTE_CLIENT_CLION_HTTP_H
-
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_HTTP_H
+#define NOTE_HTTP_H
 #include "httplib.h"
 #include "inter_var.h"
 
@@ -15,7 +19,7 @@ enum  ComType{
     ComType_post,
 };
 
-typedef int (*SERVER_CALLBACK)(const std::string& req, std::string& res, ErrorCode &error_code);
+typedef int (*SERVER_CALLBACK)(const std::string& req, std::string& res);
 
 class HTTP {
 public:
@@ -50,4 +54,4 @@ private:
     static std::map<std::string, SERVER_CALLBACK> m_server_handle_map;
 };
 
-#endif //NOTE_CLIENT_CLION_HTTP_H
+#endif //NOTE_HTTP_H

@@ -1,5 +1,10 @@
-#ifndef CHOOSECOLOR_H
-#define CHOOSECOLOR_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_CHOOSECOLOR_H
+#define NOTE_CLIENT_CHOOSECOLOR_H
 
 #include <QDialog>
 #include <QPaintEvent>
@@ -56,4 +61,4 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 };
 
-#endif // CHOOSECOLOR_H
+#endif // NOTE_CLIENT_CHOOSECOLOR_H

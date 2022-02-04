@@ -1,5 +1,10 @@
-#ifndef LANGUAGE_H
-#define LANGUAGE_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_LANGUAGE_H
+#define NOTE_CLIENT_LANGUAGE_H
 /**
   * 语言设置：英语和汉语
   */
@@ -74,4 +79,4 @@
 #define SOCKET_SERVER_ADDR_ERROR            "服务器不可达"
 #endif
 
-#endif // LANGUAGE_H
+#endif // NOTE_CLIENT_LANGUAGE_H

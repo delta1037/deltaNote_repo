@@ -1,5 +1,10 @@
-#ifndef C_INTER_VAR_H
-#define C_INTER_VAR_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_INTER_VAR_H
+#define NOTE_CLIENT_INTER_VAR_H
 #include <ctime>
 #include <sys/time.h>
 #include <string>
@@ -10,7 +15,7 @@
 /*************************客户端相关变量*********************************/
 /* 定时器 */
 // 自动同步时间间隔 5min
-#define TIMER_REFRESH   (1000*60*5)
+#define TIMER_REFRESH   (1000*10)
 // 提醒时间间隔 1min
 #define TIMER_REMINDER  (1000*60)
 /* 客户端版本： 3.1 */
@@ -85,7 +90,4 @@ struct NoteSetting{
 
     NoteSetting();
 };
-
-
-
-#endif //C_INTER_VAR_H
+#endif //NOTE_CLIENT_INTER_VAR_H

@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "checkupdate.h"
 #include "ui_checkupdate.h"
 #include "log.h"

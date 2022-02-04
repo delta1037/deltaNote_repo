@@ -1,5 +1,10 @@
-#ifndef DELTA_NOTE_LOG_H
-#define DELTA_NOTE_LOG_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_LOG_H
+#define NOTE_LOG_H
 
 #include "dlog.h"
 
@@ -30,4 +35,4 @@
 #define d_test_warn(format, ...) log(LOG_MODULE_INIT(d_test), LOG_WARN, FORMAT_PREFIX#format, __FILENAME__, __FUNCTION__ , __LINE__, __VA_ARGS__);
 #define d_test_debug(format, ...) log(LOG_MODULE_INIT(d_test), LOG_DEBUG, FORMAT_PREFIX#format, __FILENAME__, __FUNCTION__ , __LINE__, __VA_ARGS__);
 
-#endif //DELTA_NOTE_LOG_H
+#endif //NOTE_LOG_H

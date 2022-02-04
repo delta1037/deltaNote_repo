@@ -1,9 +1,10 @@
-//
-// Created by delta1037 on 2022/1/21.
-//
-
-#ifndef CLIENT_SETTING_CTRL_H
-#define CLIENT_SETTING_CTRL_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_SETTING_CTRL_H
+#define NOTE_CLIENT_SETTING_CTRL_H
 
 #include <QColor>
 #include "c_inter_var.h"
@@ -45,4 +46,4 @@ private:
 };
 
 
-#endif //CLIENT_SETTING_CTRL_H
+#endif //NOTE_CLIENT_SETTING_CTRL_H

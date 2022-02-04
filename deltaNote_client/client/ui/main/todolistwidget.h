@@ -1,5 +1,10 @@
-#ifndef TODOLISTWINWIDGET_H
-#define TODOLISTWINWIDGET_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_TODO_LIST_WINWIDGET_H
+#define NOTE_CLIENT_TODO_LIST_WINWIDGET_H
 
 #include <QListWidget>
 #include <QMouseEvent>
@@ -20,4 +25,4 @@ private:
     void mousePressEvent(QMouseEvent *event);
 };
 
-#endif // TODOLISTWINWIDGET_H
+#endif // NOTE_CLIENT_TODO_LIST_WINWIDGET_H

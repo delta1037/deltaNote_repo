@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "c_sync_data.h"
 #include "base64.h"
 #include "log.h"
@@ -17,6 +22,7 @@ int CSyncData::sync_token(SyncStatus &sync_status, ErrorCode &error_code) {
 
 int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
     d_logic_debug("%s", "api_sign_up start")
+    m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
     Json::Value req_group_data;
     req_group_data[USER_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
     d_logic_debug("api_sign_up send group data:%s", req_group_data.toStyledString().c_str())
@@ -41,11 +47,17 @@ int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
     d_logic_debug("api_sign_up data unpack:%s", res_group_data.c_str())
 
     // TODO group data 中可以解析出来token
+    if(sync_status == Sync_success){
+        m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
+    }else{
+        m_setting_ctrl->set_string(SETTING_PASSWORD, "");
+    }
     return RET_SUCCESS;
 }
 
 int CSyncData::sync_sign_in(SyncStatus &sync_status, ErrorCode &error_code) {
     d_logic_debug("%s", "api_sign_in start")
+    m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
     Json::Value req_group_data;
     req_group_data[USER_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
     d_logic_debug("api_sign_up send group data:%s", req_group_data.toStyledString().c_str())
@@ -68,17 +80,32 @@ int CSyncData::sync_sign_in(SyncStatus &sync_status, ErrorCode &error_code) {
         return RET_FAILED;
     }
     d_logic_debug("api_sign_up data unpack:%s", res_group_data.c_str())
+    if(sync_status == Sync_success){
+        m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
+    }else{
+        m_setting_ctrl->set_string(SETTING_PASSWORD, "");
+    }
     return RET_SUCCESS;
 }
 
 int CSyncData::sync_data(SyncStatus &sync_status, ErrorCode &error_code) {
     // 同步操作先上传再下载
+    m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
     if(RET_FAILED == sync_upload(sync_status, error_code)){
+        d_logic_error("%s", "sync_upload error")
         return RET_FAILED;
     }
-    //m_data_ctrl->del_todo()
-    if(RET_FAILED == sync_download(sync_status, error_code)){
+    int ret = m_data_ctrl->del_todo(ListType_OP, error_code);
+    if(ret != RET_SUCCESS){
+        d_logic_error("%s", "sync_data del op list error")
         return RET_FAILED;
+    }
+    if(RET_FAILED == sync_download(sync_status, error_code)){
+        d_logic_error("%s", "sync_download error")
+        return RET_FAILED;
+    }
+    if(sync_status == Sync_success){
+        m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
     }
     return RET_SUCCESS;
 }
@@ -90,10 +117,11 @@ int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
     TodoList t_todo_list;
     int ret = m_data_ctrl->sel_todo(ListType_OP, t_todo_list, error_code);
     if(ret == RET_FAILED){
-        d_logic_error("api_upload db sel data error, coee:%d", error_code)
+        d_logic_error("api_upload db sel data error, code:%d", error_code)
         sync_status = Sync_client_error;
         return RET_FAILED;
     }
+    d_logic_debug("%s", "start set json list")
     req_group_data[SYNC_TODO_LIST] = json_list(t_todo_list);
     d_logic_debug("api_upload send group data:%s", req_group_data.toStyledString().c_str())
 

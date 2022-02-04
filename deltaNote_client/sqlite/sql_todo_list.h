@@ -1,7 +1,11 @@
-#ifndef SQL_TODO_LIST_H
-#define SQL_TODO_LIST_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_SQL_TODO_LIST_H
+#define NOTE_SQL_TODO_LIST_H
 #include <string>
-
 #include "sql_base.h"
 
 class SqlTodoList {
@@ -57,6 +61,4 @@ private:
     std::string db_name;
     std::string table_name;
 };
-
-
-#endif //SQL_TODO_LIST_H
+#endif //NOTE_SQL_TODO_LIST_H

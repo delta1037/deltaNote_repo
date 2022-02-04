@@ -1,5 +1,10 @@
-#ifndef CLIENT_SYNC_DATA_H
-#define CLIENT_SYNC_DATA_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_SYNC_DATA_H
+#define NOTE_CLIENT_SYNC_DATA_H
 
 #include "http.h"
 #include "setting_ctrl.h"
@@ -37,4 +42,4 @@ private:
 
     Json::Reader m_json_reader;
 };
-#endif //CLIENT_SYNC_DATA_H
+#endif //NOTE_CLIENT_SYNC_DATA_H

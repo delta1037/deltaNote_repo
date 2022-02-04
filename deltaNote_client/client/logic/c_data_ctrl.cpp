@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "c_data_ctrl.h"
 #include "log.h"
 
@@ -309,6 +314,7 @@ int CDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code){
         }
     }
 
+    // TODO 这里全删除是有风险的
     // 清空原ui表
     int ret = m_ui_list->del(error_code);
     if(ret == RET_FAILED){
@@ -330,10 +336,10 @@ int CDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code){
                 todo_item.data,
                 error_code);
         if(ret == RET_FAILED){
-            d_logic_error("CDataCtrl key %s add m_op_list error", todo_item.create_key.c_str())
+            d_logic_error("CDataCtrl key %s add m_ui_list error", todo_item.create_key.c_str())
             return RET_FAILED;
         }
-        d_logic_debug("CDataCtrl key %s add m_op_list success", todo_item.create_key.c_str())
+        d_logic_debug("CDataCtrl key %s add m_ui_list success", todo_item.create_key.c_str())
     }
     return RET_SUCCESS;
 }

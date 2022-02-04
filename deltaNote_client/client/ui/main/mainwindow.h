@@ -1,5 +1,10 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
+#ifndef NOTE_CLIENT_MAINWINDOW_H
+#define NOTE_CLIENT_MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QMouseEvent>
@@ -156,9 +161,10 @@ private:
 
     // 编辑控制
     bool is_editing;
+    uint64_t new_todo_add_time_s;
 #ifdef LINUX_CLIENT
     QTimer *dataSaveTimer;
     bool settingChange;
 #endif
 };
-#endif // MAINWINDOW_H
+#endif // NOTE_CLIENT_MAINWINDOW_H

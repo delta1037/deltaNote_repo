@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include "s_data_ctrl.h"
 #include "s_inter_var.h"
 #include "log.h"
@@ -68,14 +73,15 @@ int SDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code) {
         if((it.op_type == OpType_add || it.op_type == OpType_alt) && it_find == t_des_map.end()){
             sql_ret = m_op_list->add(it.create_key, it.edit_key, it.op_type, it.is_check, it.tag_type, it.reminder, it.data, error_code);
         }else if(it.op_type == OpType_alt && it_find != t_des_map.end()){
-            // 如果已经存在，如果时间新一些就替换
+            // 如果alt条目已经存在，如果时间更新一些就替换原来的
             if(it.edit_key > it_find->second.edit_key){
-                sql_ret = m_op_list->alt(it.create_key, it.edit_key, it.op_type, it.is_check, it.tag_type, it.reminder, it.data, error_code);
+                sql_ret = m_op_list->alt(it.create_key, it.op_type, it.edit_key,  it.is_check, it.tag_type, it.reminder, it.data, error_code);
             }
-        }else if(it.op_type == OpType_del && it_find != t_des_map.end()){
+        }else if(it.op_type == OpType_del){
+            // 如果是删除操作，直接删了就行了
             sql_ret = m_op_list->del(it.create_key, error_code);
         }else{
-            d_logic_error("unknown op_type:%s, find_key:%s, is_find:%d",
+            d_logic_debug("ignore op_type:%s, find_key:%s, is_find:%d",
                           op_type_str(it.op_type).c_str(),
                           find_key.c_str(),
                           it_find == t_des_map.end())

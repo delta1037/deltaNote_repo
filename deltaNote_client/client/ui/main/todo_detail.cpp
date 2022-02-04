@@ -1,3 +1,8 @@
+/**
+ * @author: delta1037
+ * @mail:geniusrabbit@qq.com
+ * @brief:
+ */
 #include <QListView>
 #include "todo_detail.h"
 #include "ui_todo_detail.h"
