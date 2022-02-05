@@ -138,6 +138,7 @@ int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
     // 聚合数据需要加密
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
+    d_logic_debug("start post, net handle:%p", m_net_handle)
     ret = m_net_handle->c_post(SYNC_UPLOAD, t_req, t_res, error_code);
     if(ret != RET_SUCCESS){
         d_logic_error("api_upload send %s to get data error", t_req.c_str())

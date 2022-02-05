@@ -206,15 +206,14 @@ void MainWindow::on_refresh_clicked(){
     }
     m_is_show_history = false;
     // 刷新重置状态
+    d_ui_debug("%s", "on_refresh_clicked refresh status")
     set_edit_status(false);
-
+    new_todo_add_time_s = 0; // 重置计时
     // 刷新界面:先做本地同步刷新，再做网络异步刷新
     d_ui_debug("%s", "on_refresh_clicked do _sync_todo_list")
     sync_todo_list();
-    if(m_setting_ctrl.get_bool(SETTING_IS_LOGIN)){
-        // 如果登录了就做一下网络刷新
-        sync_todo_list(true, true);
-    }
+    // 做一下网络刷新
+    sync_todo_list(true, true);
 }
 
 // 锁定操作
