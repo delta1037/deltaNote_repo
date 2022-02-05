@@ -24,6 +24,7 @@ CDataCtrl::~CDataCtrl(){
 int CDataCtrl::add_todo(const TodoItem &data_item, ErrorCode &error_code) {
     // 操作流中新增该记录（创建时间key值保证该便签key不会与之前的key重复）
     string edit_key = get_time_key();
+    m_op_list_lock.lock();
     int ret = m_op_list->add(
             data_item.create_key,
             edit_key,
@@ -33,13 +34,15 @@ int CDataCtrl::add_todo(const TodoItem &data_item, ErrorCode &error_code) {
             data_item.reminder,
             data_item.data,
             error_code);
-    if(ret == RET_FAILED){
+    m_op_list_lock.unlock();
+    if(ret != RET_SUCCESS){
         d_logic_error("CDataCtrl key %s add m_op_list error", data_item.create_key.c_str())
         return RET_FAILED;
     }
     d_logic_debug("CDataCtrl key %s add m_op_list success", data_item.create_key.c_str())
 
     // UI表中新增数据
+    m_ui_list_lock.lock();
     ret = m_ui_list->add(
             data_item.create_key,
             edit_key,
@@ -49,7 +52,8 @@ int CDataCtrl::add_todo(const TodoItem &data_item, ErrorCode &error_code) {
             data_item.reminder,
             data_item.data,
             error_code);
-    if(ret == RET_FAILED){
+    m_ui_list_lock.unlock();
+    if(ret != RET_SUCCESS){
         d_logic_error("CDataCtrl key %s add m_ui_list error", data_item.create_key.c_str())
         return RET_FAILED;
     }
@@ -66,9 +70,11 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
     // 操作流表
     string edit_key = get_time_key();
     TodoList ret_list;
+    m_op_list_lock.lock();
     int ret = m_op_list->sel(data_item.create_key, OpType_alt, ret_list, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("CDataCtrl key %s sel m_op_list error", data_item.create_key.c_str())
+        m_op_list_lock.unlock();
         return RET_FAILED;
     }
     d_logic_debug("CDataCtrl key %s sel m_op_list success", data_item.create_key.c_str())
@@ -83,8 +89,9 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s add m_op_list error", data_item.create_key.c_str())
+            m_op_list_lock.unlock();
             return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s add m_op_list success", data_item.create_key.c_str())
@@ -99,18 +106,22 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s alt m_op_list error", data_item.create_key.c_str())
+            m_op_list_lock.unlock();
             return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s alt m_op_list success", data_item.create_key.c_str())
     }
+    m_op_list_lock.unlock();
 
     // UI界面表
     ret_list.clear(); // 注意清理环境
+    m_ui_list_lock.lock();
     ret = m_ui_list->sel(data_item.create_key, ret_list, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("CDataCtrl key %s sel m_ui_list error", data_item.create_key.c_str())
+        m_ui_list_lock.unlock();
         return RET_FAILED;
     }
     d_logic_debug("CDataCtrl key %s sel m_ui_list success", data_item.create_key.c_str())
@@ -125,8 +136,9 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s add m_ui_list error", data_item.create_key.c_str())
+            m_ui_list_lock.unlock();
             return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s add m_ui_list success", data_item.create_key.c_str())
@@ -141,12 +153,14 @@ int CDataCtrl::alt_todo(const TodoItem &data_item, ErrorCode &error_code) {
                 data_item.reminder,
                 data_item.data,
                 error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s alt m_ui_list error", data_item.create_key.c_str())
+            m_ui_list_lock.unlock();
             return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s alt m_ui_list success", data_item.create_key.c_str())
     }
+    m_ui_list_lock.unlock();
     return RET_SUCCESS;
 }
 
@@ -159,9 +173,11 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
     // 操作流表
     string edit_key = get_time_key();
     TodoList ret_list;
+    m_op_list_lock.lock();
     int ret = m_op_list->sel(create_key, OpType_add, ret_list, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("CDataCtrl key %s sel m_op_list error", create_key.c_str())
+        m_op_list_lock.unlock();
         return RET_FAILED;
     }
     d_logic_debug("CDataCtrl key %s sel m_op_list success", create_key.c_str())
@@ -176,24 +192,29 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
                 "",
                 "",
                 error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s add m_op_list error", create_key.c_str())
+            m_op_list_lock.unlock();
             return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s add m_op_list success", create_key.c_str())
     }else{
         // 如果存在新增操作，删除所有内容
         ret = m_op_list->del(create_key, error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s alt m_op_list error", create_key.c_str())
+            m_op_list_lock.unlock();
             return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s alt m_op_list success", create_key.c_str())
     }
+    m_op_list_lock.unlock();
 
     // UI表操作，删除相关内容即可
+    m_ui_list_lock.lock();
     ret = m_ui_list->del(create_key, error_code);
-    if(ret == RET_FAILED){
+    m_ui_list_lock.unlock();
+    if(ret != RET_SUCCESS){
         d_logic_error("CDataCtrl key %s alt m_ui_list error", create_key.c_str())
         return RET_FAILED;
     }
@@ -204,15 +225,19 @@ int CDataCtrl::del_todo(const std::string &create_key, ErrorCode &error_code) {
 
 int CDataCtrl::del_todo(ListType list_type, ErrorCode &error_code) {
     if(list_type == ListType_OP){
+        m_op_list_lock.lock();
         int ret = m_op_list->del(error_code);
-        if(ret == RET_FAILED){
+        m_op_list_lock.unlock();
+        if(ret != RET_SUCCESS){
             d_logic_error("%s", "CDataCtrl del m_op_list error")
             return RET_FAILED;
         }
         d_logic_debug("%s", "CDataCtrl sel m_op_list success")
     }else if(list_type == ListType_UI){
+        m_ui_list_lock.lock();
         int ret = m_ui_list->del(error_code);
-        if(ret == RET_FAILED){
+        m_ui_list_lock.unlock();
+        if(ret != RET_SUCCESS){
             d_logic_error("%s", "CDataCtrl del m_ui_list error")
             return RET_FAILED;
         }
@@ -226,15 +251,19 @@ int CDataCtrl::del_todo(ListType list_type, ErrorCode &error_code) {
 
 int CDataCtrl::sel_todo(ListType list_type, TodoList &ret_list, ErrorCode &error_code) {
     if(list_type == ListType_OP){
+        m_op_list_lock.lock();
         int ret = m_op_list->sel(ret_list, error_code);
-        if(ret == RET_FAILED){
+        m_op_list_lock.unlock();
+        if(ret != RET_SUCCESS){
             d_logic_error("%s", "CDataCtrl sel m_op_list error")
             return RET_FAILED;
         }
         d_logic_debug("%s", "CDataCtrl sel m_op_list success")
     }else if(list_type == ListType_UI){
+        m_ui_list_lock.lock();
         int ret = m_ui_list->sel(ret_list, error_code);
-        if(ret == RET_FAILED){
+        m_ui_list_lock.unlock();
+        if(ret != RET_SUCCESS){
             d_logic_error("%s", "CDataCtrl sel m_ui_list error")
             return RET_FAILED;
         }
@@ -257,15 +286,19 @@ int CDataCtrl::sel_todo(ListType list_type, TodoList &ret_list, ErrorCode &error
 int CDataCtrl::sel_todo(ListType list_type, const string &create_key, list<struct TodoItem> &ret_list,
                         ErrorCode &error_code) {
     if(list_type == ListType_OP){
+        m_op_list_lock.lock();
         int ret = m_op_list->sel(create_key, ret_list, error_code);
-        if(ret == RET_FAILED){
+        m_op_list_lock.unlock();
+        if(ret != RET_SUCCESS){
             d_logic_error("%s", "CDataCtrl sel m_op_list error")
             return RET_FAILED;
         }
         d_logic_debug("%s", "CDataCtrl sel m_op_list success")
     }else if(list_type == ListType_UI){
+        m_ui_list_lock.lock();
         int ret = m_ui_list->sel(create_key, ret_list, error_code);
-        if(ret == RET_FAILED){
+        m_ui_list_lock.unlock();
+        if(ret != RET_SUCCESS){
             d_logic_error("%s", "CDataCtrl sel m_ui_list error")
             return RET_FAILED;
         }
@@ -316,9 +349,11 @@ int CDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code){
 
     // TODO 这里全删除是有风险的
     // 清空原ui表
+    m_ui_list_lock.lock();
     int ret = m_ui_list->del(error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("%s", "CDataCtrl del m_ui_list error")
+        m_ui_list_lock.unlock();
         return RET_FAILED;
     }
     d_logic_debug("%s", "CDataCtrl del m_ui_list success")
@@ -335,11 +370,11 @@ int CDataCtrl::mrg_todo(const TodoList &src_list, ErrorCode &error_code){
                 todo_item.reminder,
                 todo_item.data,
                 error_code);
-        if(ret == RET_FAILED){
+        if(ret != RET_SUCCESS){
             d_logic_error("CDataCtrl key %s add m_ui_list error", todo_item.create_key.c_str())
-            return RET_FAILED;
         }
         d_logic_debug("CDataCtrl key %s add m_ui_list success", todo_item.create_key.c_str())
     }
+    m_ui_list_lock.unlock();
     return RET_SUCCESS;
 }

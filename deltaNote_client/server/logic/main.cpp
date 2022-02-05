@@ -25,10 +25,14 @@ int register_process(HTTP &server){
     return RET_SUCCESS;
 }
 
-int main(){
-    d_logic_info("%s", "main_start")
+int main(int argc, char* argv[]){
+    int server_port = 1234;
+    if(argc > 1){
+        server_port = atoi(argv[1]);
+    }
+    d_logic_info("delta note server start at %s:%d", "0.0.0.0", server_port)
     // 配置服务端
-    HTTP server(HTTP_server, "0.0.0.0", 1234);
+    HTTP server(HTTP_server, "0.0.0.0", server_port);
 
     // 注册处理
     register_process(server);

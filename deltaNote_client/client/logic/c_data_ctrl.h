@@ -6,7 +6,7 @@
 #ifndef NOTE_CLIENT_DATA_CTRL_H
 #define NOTE_CLIENT_DATA_CTRL_H
 #include <string>
-
+#include <mutex>
 #include "sql_todo_list.h"
 #include "c_inter_var.h"
 
@@ -35,7 +35,12 @@ public:
     int sel_todo(ListType list_type, const std::string &create_key, TodoList &ret_list, ErrorCode &error_code);
     // 合并
     int mrg_todo(const TodoList &src_list, ErrorCode &error_code);
+
 private:
+    // 资源锁，进行一些不可阻断操作
+    std::mutex m_op_list_lock;
+    std::mutex m_ui_list_lock;
+    // 数据库操作对象
     SqlTodoList *m_op_list;
     SqlTodoList *m_ui_list;
 };

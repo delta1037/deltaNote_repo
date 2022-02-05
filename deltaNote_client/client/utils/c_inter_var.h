@@ -15,7 +15,9 @@
 /*************************客户端相关变量*********************************/
 /* 定时器 */
 // 自动同步时间间隔 5min
-#define TIMER_REFRESH   (1000*10)
+#define TIMER_REFRESH       (1000*60*5)
+// 遇到新增时，修改临时同步时间间隔
+#define TIMER_REFRESH_QUICK (1000*30)
 // 提醒时间间隔 1min
 #define TIMER_REMINDER  (1000*60)
 /* 客户端版本： 3.1 */

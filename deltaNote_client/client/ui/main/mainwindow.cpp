@@ -108,9 +108,9 @@ void MainWindow::event_connect(){
     connect(ui->ToDoListWin, SIGNAL(addSignal()), this, SLOT(do_add_clicked()));// 添加新TODO动作
 
     // 定时刷新
-    refreshTimer = new QTimer(this);
-    connect(refreshTimer, &QTimer::timeout, [this](){ sync_todo_list(true, true); });
-    refreshTimer->start(TIMER_REFRESH);
+    refresh_timer = new QTimer(this);
+    connect(refresh_timer, &QTimer::timeout, [this](){ sync_todo_list(true, true); });
+    refresh_timer->start(TIMER_REFRESH);
 
     // 定时更新
     //uploadTimer = new QTimer(this);
@@ -189,17 +189,12 @@ void MainWindow::on_setting_clicked(){
     d_ui_debug("main desktop w:%d h:%d", m_desktop_rect.width(), m_desktop_rect.height())
 
     // 显示setting界面
-    //login m_login_window(this, &m_setting_ctrl, m_sync_data);
     m_login_window->set_value();
     m_login_window->exec();
 
     // 列表内容重绘，这里可能在设置里做了登录操作，所以需要做完整的刷新操作
     d_ui_debug("%s", "on_setting_clicked do _on_refresh_clicked")
     on_refresh_clicked();
-
-    // 新的配置过来可能需要刷新界面
-    // refresh_background();
-    // QTimer::singleShot(1, this, SLOT(refresh_background()));
 }
 
 void MainWindow::on_refresh_clicked(){
@@ -216,10 +211,10 @@ void MainWindow::on_refresh_clicked(){
     // 刷新界面:先做本地同步刷新，再做网络异步刷新
     d_ui_debug("%s", "on_refresh_clicked do _sync_todo_list")
     sync_todo_list();
-    //if(m_setting_ctrl.get_bool(SETTING_IS_LOGIN)){
+    if(m_setting_ctrl.get_bool(SETTING_IS_LOGIN)){
         // 如果登录了就做一下网络刷新
         sync_todo_list(true, true);
-    //}
+    }
 }
 
 // 锁定操作
@@ -312,11 +307,19 @@ void MainWindow::do_add_clicked(){
 
 void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
     // 如果正在编辑，就忽略此次刷新(30s内)
+    static bool is_new_todo_adding = false;
     uint64_t t_now_times = get_time_of_s();
     d_ui_debug("now time:%d, last new todo time:%d", t_now_times, new_todo_add_time_s)
     if(t_now_times - new_todo_add_time_s < 30){
         d_logic_info("%s", "new todo add, ignore sync")
+        // 短暂的设置一下同步定时器,短时间内在重试
+        is_new_todo_adding = true;
+        refresh_timer->setInterval(TIMER_REFRESH_QUICK);
         return;
+    }
+    if(is_new_todo_adding){
+        // 如果之前重置过自动同步，再设置回来
+        refresh_timer->setInterval(TIMER_REFRESH);
     }
 
     // 正在编辑不允许刷新
@@ -380,6 +383,8 @@ void MainWindow::sync_todo_list(bool async, bool net_sync, bool is_wait){
         int ret = m_sync_data->sync_data(net_status, error_code);
         if(ret != RET_SUCCESS){
             d_ui_error("net sync data error, net_status:%d, error_code:%d", net_status, error_code)
+            // 同步失败就把密码清理掉
+            m_setting_ctrl.set_string(SETTING_PASSWORD, "");
         }
     }
 

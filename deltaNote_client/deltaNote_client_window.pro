@@ -113,11 +113,18 @@ LIBS += -L$$PWD/3rdparty/jsoncpp/bin -ljsoncpp
 # base64
 INCLUDEPATH += $$PWD/3rdparty/base64/include
 LIBS += -L$$PWD/3rdparty/base64/bin -lbase64
+# aes_encryption
+INCLUDEPATH += $$PWD/3rdparty/aes_encryption/include
+LIBS += -L$$PWD/3rdparty/aes_encryption/bin -laes_encryption
+# cryptopp860
+INCLUDEPATH += $$PWD/3rdparty/cryptopp860/include
+LIBS += -L$$PWD/3rdparty/cryptopp860/bin -lcryptopp
 # HTTP lib
 INCLUDEPATH += $$PWD/3rdparty/httplib/include
 LIBS += -lws2_32
 
 DEFINES += WINDOW_CLIENT
+DEFINES += WINDOW_BUILD
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

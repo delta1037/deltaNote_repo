@@ -11,7 +11,17 @@ CSyncData::CSyncData(SettingCtrl *setting_ctrl, CDataCtrl *data_ctrl){
     this->m_setting_ctrl = setting_ctrl;
     this->m_data_ctrl = data_ctrl;
 
-    this->m_net_handle = new HTTP(HTTP_client, "http://192.168.0.106:1234");
+    std::string server = m_setting_ctrl->get_string(SETTING_SERVER);
+    this->m_net_handle = new HTTP(HTTP_client, "http://" + server);
+}
+
+int CSyncData::sync_reset_server() {
+    d_logic_debug("%s", "sync_reset_server")
+    std::lock_guard<std::mutex> t_lock_guard(m_net_handle_lock);
+    delete this->m_net_handle;
+    std::string server = m_setting_ctrl->get_string(SETTING_SERVER);
+    this->m_net_handle = new HTTP(HTTP_client, "http://" + server);
+    return RET_SUCCESS;
 }
 
 int CSyncData::sync_token(SyncStatus &sync_status, ErrorCode &error_code) {
@@ -22,6 +32,7 @@ int CSyncData::sync_token(SyncStatus &sync_status, ErrorCode &error_code) {
 
 int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
     d_logic_debug("%s", "api_sign_up start")
+    std::lock_guard<std::mutex> t_lock_guard(m_net_handle_lock);
     m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
     Json::Value req_group_data;
     req_group_data[USER_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
@@ -31,7 +42,7 @@ int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     int ret = m_net_handle->c_get(SYNC_SIGN_UP, t_req, t_res, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("api_sign_up send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
@@ -40,7 +51,7 @@ int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
@@ -49,14 +60,13 @@ int CSyncData::sync_sign_up(SyncStatus &sync_status, ErrorCode &error_code) {
     // TODO group data 中可以解析出来token
     if(sync_status == Sync_success){
         m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
-    }else{
-        m_setting_ctrl->set_string(SETTING_PASSWORD, "");
     }
     return RET_SUCCESS;
 }
 
 int CSyncData::sync_sign_in(SyncStatus &sync_status, ErrorCode &error_code) {
     d_logic_debug("%s", "api_sign_in start")
+    std::lock_guard<std::mutex> t_lock_guard(m_net_handle_lock);
     m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
     Json::Value req_group_data;
     req_group_data[USER_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
@@ -66,30 +76,30 @@ int CSyncData::sync_sign_in(SyncStatus &sync_status, ErrorCode &error_code) {
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     int ret = m_net_handle->c_get(SYNC_SIGN_IN, t_req, t_res, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("api_sign_up send %s to get data error", t_req.c_str())
-        sync_status = Sync_undefined_error;
+        sync_status = Sync_server_error;
         return RET_FAILED;
     }
     d_logic_debug("api_sign_up recv data:%s", t_res.c_str())
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
+        sync_status = Sync_client_error;
         return RET_FAILED;
     }
     d_logic_debug("api_sign_up data unpack:%s", res_group_data.c_str())
     if(sync_status == Sync_success){
         m_setting_ctrl->set_bool(SETTING_IS_LOGIN, true);
-    }else{
-        m_setting_ctrl->set_string(SETTING_PASSWORD, "");
     }
     return RET_SUCCESS;
 }
 
 int CSyncData::sync_data(SyncStatus &sync_status, ErrorCode &error_code) {
     // 同步操作先上传再下载
+    std::lock_guard<std::mutex> t_lock_guard(m_net_handle_lock);
     m_setting_ctrl->set_bool(SETTING_IS_LOGIN, false);
     if(RET_FAILED == sync_upload(sync_status, error_code)){
         d_logic_error("%s", "sync_upload error")
@@ -116,7 +126,7 @@ int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
     req_group_data[SYNC_PASSWORD] = m_setting_ctrl->get_string(SETTING_PASSWORD);
     TodoList t_todo_list;
     int ret = m_data_ctrl->sel_todo(ListType_OP, t_todo_list, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("api_upload db sel data error, code:%d", error_code)
         sync_status = Sync_client_error;
         return RET_FAILED;
@@ -129,7 +139,7 @@ int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     ret = m_net_handle->c_post(SYNC_UPLOAD, t_req, t_res, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("api_upload send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
@@ -138,7 +148,7 @@ int CSyncData::sync_upload(SyncStatus &sync_status, ErrorCode &error_code) {
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
@@ -156,7 +166,7 @@ int CSyncData::sync_download(SyncStatus &sync_status, ErrorCode &error_code) {
     std::string t_req = pack_packet(req_group_data.toStyledString());
     std::string t_res;
     int ret = m_net_handle->c_get(SYNC_DOWNLOAD, t_req, t_res, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("api_download send %s to get data error", t_req.c_str())
         sync_status = Sync_undefined_error;
         return RET_FAILED;
@@ -165,7 +175,7 @@ int CSyncData::sync_download(SyncStatus &sync_status, ErrorCode &error_code) {
 
     std::string res_group_data;
     ret = unpack_packet(t_res, res_group_data, sync_status, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("unpack data pack %s failed, status = %d", t_res.c_str(), sync_status)
         return RET_FAILED;
     }
@@ -181,7 +191,7 @@ int CSyncData::sync_download(SyncStatus &sync_status, ErrorCode &error_code) {
     });
 
     ret = m_data_ctrl->mrg_todo(t_todo_list, error_code);
-    if(ret == RET_FAILED){
+    if(ret != RET_SUCCESS){
         d_logic_error("mrg_todo fail, error_code:%d", error_code);
     }
     return ret;

@@ -149,7 +149,7 @@ int HTTP::s_register_callback(ComType com_type, const std::string &handle, SERVE
     }
 
     m_server_handle_map[handle] = handle_callback;
-    d_net_debug("server register type:%d,handle:%s,address:%p success", com_type, handle.c_str(), handle_callback)
+    d_net_info("server register type:%d,handle:%s,address:%p success", com_type, handle.c_str(), handle_callback)
     return RET_SUCCESS;
 }
 

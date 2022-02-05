@@ -5,7 +5,7 @@
  */
 #ifndef NOTE_CLIENT_SYNC_DATA_H
 #define NOTE_CLIENT_SYNC_DATA_H
-
+#include <mutex>
 #include "http.h"
 #include "setting_ctrl.h"
 #include "c_data_ctrl.h"
@@ -17,6 +17,7 @@ class CSyncData {
 public:
     CSyncData(SettingCtrl *setting_ctrl, CDataCtrl *data_ctrl);
 
+    int sync_reset_server();
     // 获取token
     int sync_token(SyncStatus &net_status, ErrorCode &error_code);
     // 注册
@@ -37,6 +38,8 @@ private:
 
 private:
     HTTP *m_net_handle;
+    std::mutex m_net_handle_lock;
+
     SettingCtrl *m_setting_ctrl;
     CDataCtrl *m_data_ctrl;
 

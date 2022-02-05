@@ -113,7 +113,7 @@ private:
     QAction *action_update;
 
     // 一些定时器
-    QTimer *refreshTimer;
+    QTimer *refresh_timer;
     QTimer *uploadTimer;
     QTimer *remind_timer;
 

@@ -129,12 +129,14 @@ void newUser::on_ok_clicked()
         ui->passwd->setFocus();
         MessagesBox::warn(this, NEW_USER_PASSWD_INCPABLE, m_setting_ctrl);
     } else {
+        m_setting_ctrl->set_string(SETTING_SERVER, QS_server_port.toStdString());
         m_setting_ctrl->set_string(SETTING_USERNAME, QS_username.toStdString());
         m_setting_ctrl->set_string(SETTING_PASSWORD, QS_passwd.toStdString());
 
         SyncStatus sync_status = Sync_success;
         ErrorCode error_code = Error_no_error;
         d_ui_debug("%s", "do sign in progress")
+        m_sync_data->sync_reset_server(); // 重置服务器连接
         int ret = m_sync_data->sync_sign_up(sync_status, error_code);
         if(ret != RET_SUCCESS){
             d_ui_error("user %s do login error", m_setting_ctrl->get_string(SETTING_USERNAME).c_str());
@@ -153,8 +155,6 @@ void newUser::on_ok_clicked()
             ui->username->clear();
             ui->username->setFocus();
             MessagesBox::warn(this, NEW_USER_USER_EXITS, m_setting_ctrl);
-        } else if (sync_status == Sync_undefined_error) {
-            MessagesBox::warn(this, NEW_USER_SERVER_ERROR, m_setting_ctrl);
         } else {
             MessagesBox::warn(this, NEW_USER_SERVER_CON_ERROR, m_setting_ctrl);
         }

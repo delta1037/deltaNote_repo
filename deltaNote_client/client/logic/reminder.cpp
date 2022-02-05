@@ -39,7 +39,6 @@ bool Reminder::check_and_notify() {
     d_logic_debug("%s", "check and send notify to user")
     int now_time_s = int(get_time_of_s());
     int now_time_idx = 60 - (now_time_s % 60);
-    // TODO 这里要不要加个锁？按理说程序运行是单线程的，不需要考虑锁的问题（这里流程需要再确认一下）
     m_register_map_lock.lock();
     for(const auto &it : m_register_map){
         // 发过通知了就把发过的时间清空

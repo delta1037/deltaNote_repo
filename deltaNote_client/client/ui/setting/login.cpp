@@ -207,13 +207,14 @@ void login::doLogin(){
         ui->password->setFocus();
         MessagesBox::warn(this, LOGIN_PASSWORD_NULL, m_setting_ctrl);
     } else {
-        // set username and passwd
+        m_setting_ctrl->set_string(SETTING_SERVER, QS_server_port.toStdString());
         m_setting_ctrl->set_string(SETTING_USERNAME, QS_username.toStdString());
         m_setting_ctrl->set_string(SETTING_PASSWORD, QS_passwd.toStdString());
 
         SyncStatus sync_status = Sync_success;
         ErrorCode error_code = Error_no_error;
         d_ui_debug("%s", "do sign in progress")
+        m_sync_data->sync_reset_server(); // 重置服务器连接
         int ret = m_sync_data->sync_sign_in(sync_status, error_code);
         if(ret != RET_SUCCESS){
             d_ui_error("user %s do login error", m_setting_ctrl->get_string(SETTING_USERNAME).c_str())
@@ -237,11 +238,6 @@ void login::doLogin(){
             ui->password->clear();
             ui->username->setFocus();
             MessagesBox::warn(this, LOGIN_USER_N_EXITS, m_setting_ctrl);
-        } else if(sync_status == Sync_undefined_error) {
-            ui->username->clear();
-            ui->password->clear();
-            ui->username->setFocus();
-            MessagesBox::warn(this, LOGIN_SERVER_ERROR, m_setting_ctrl);
         } else {
             ui->password->clear();
             ui->password->setFocus();
@@ -267,11 +263,10 @@ void login::on_Login_clicked(){
 void login::on_creteNewUser_clicked(){
     newUser new_user(this, m_setting_ctrl, m_sync_data);
     setWindowOpacity(0);
-    if (new_user.exec() == QDialog::Accepted ) {
-        string t_username = m_setting_ctrl->get_string(SETTING_USERNAME);
-        ui->username->setText(QString::fromStdString(t_username));
-        accept();
-    }
+    // 启动新增用户界面
+    new_user.exec();
+    // 重新设值
+    set_value();
     setWindowOpacity(1);
 }
 
