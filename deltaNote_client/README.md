@@ -1,5 +1,7 @@
 # deltaNote客户端
 
+[客户端使用指南](https://www.notion.so/delta1037/e4ae064f63394961a31a5a12818a3ac0)
+
 ## 客户端重构架构设计
 
 -   日志模块：用于日志打印
